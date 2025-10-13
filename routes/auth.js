@@ -65,9 +65,12 @@ router.get('/logout', (req, res) => {
 });
 
 router.get('/profile', isLoggedIn, async (req, res) => {
-  const tickets = await Ticket.find({ buyer: req.session.user._id }).populate('event').sort({ purchasedAt: -1 });
+  const tickets = await Ticket.find({ buyer: req.session.user._id })
+    .populate('event')
+    .sort({ purchasedAt: -1 });
   res.render('profile', { tickets });
 });
+
 
 router.get('/wallet', isLoggedIn, async (req, res) => {
   try {
