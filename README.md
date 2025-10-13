@@ -1,0 +1,11 @@
+# Event Ticketing (Node/Express/EJS/MongoDB)
+
+## Quick start
+1. copy `.env.example` to `.env` and set MONGO_URI and SESSION_SECRET
+2. `npm install`
+3. `npm run seed` (creates sample users/events)
+4. `npm run dev` or `npm start`
+
+Default seed users:
+- organizer: org@example.com / password
+- attendee: att@example.com / password

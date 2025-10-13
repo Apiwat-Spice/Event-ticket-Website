@@ -1,0 +1,36 @@
+<%- include('../partials/header') %>
+<div class="row">
+  <div class="col-md-8">
+    <h2><%= event.title %></h2>
+    <% if (event.image) { %>
+      <img src="<%= event.image %>" class="img-fluid mb-3" />
+    <% } %>
+    <p><%= event.description %></p>
+    <p><strong>วันที่:</strong> <%= event.date ? event.date.toLocaleString() : '-' %></p>
+    <p><strong>สถานที่:</strong> <%= event.location || '-' %></p>
+    <p><strong>ราคา:</strong> ฿<%= event.price %></p>
+    <p><strong>ตั๋วคงเหลือ:</strong> <%= event.totalTickets - event.soldTickets %></p>
+    <% if (typeof error !== 'undefined') { %>
+      <div class="alert alert-danger"><%= error %></div>
+    <% } %>
+
+    <% if (currentUser) { %>
+      <form action="/events/<%= event._id %>/book" method="POST" class="row g-2 align-items-center">
+        <div class="col-auto">
+          <input type="number" name="quantity" min="1" class="form-control" value="1" style="width:100px;">
+        </div>
+        <div class="col-auto">
+          <button class="btn btn-success">จอง/ซื้อ (จำลอง)</button>
+        </div>
+      </form>
+    <% } else { %>
+      <p>กรุณา <a href="/login">เข้าสู่ระบบ</a> เพื่อจองตั๋ว</p>
+    <% } %>
+  </div>
+
+  <div class="col-md-4">
+    <h5>ผู้จัดงาน</h5>
+    <p><%= event.organizer ? event.organizer.name : '-' %></p>
+  </div>
+</div>
+<%- include('../partials/footer') %>

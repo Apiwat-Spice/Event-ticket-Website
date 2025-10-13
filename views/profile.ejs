@@ -1,0 +1,19 @@
+<%- include('partials/header') %>
+<h2>โปรไฟล์ของฉัน</h2>
+<p><strong>ชื่อ:</strong> <%= currentUser.name %></p>
+<p><strong>อีเมล:</strong> <%= currentUser.email %></p>
+<hr>
+<h4>ประวัติการสั่งซื้อ</h4>
+<% if (!tickets || tickets.length === 0) { %>
+  <p>ยังไม่มีการจอง</p>
+<% } else { %>
+  <ul class="list-group">
+    <% tickets.forEach(t => { %>
+      <li class="list-group-item">
+        <strong><%= t.event.title %></strong> - จำนวน <%= t.quantity %> ใบ
+        <div><small>วันที่ซื้อ: <%= t.purchasedAt.toLocaleString() %></small></div>
+      </li>
+    <% }) %>
+  </ul>
+<% } %>
+<%- include('partials/footer') %>
