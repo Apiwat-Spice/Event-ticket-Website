@@ -1,38 +1,97 @@
 <%- include('../partials/header') %>
-<div class="row">
-  <div class="col-md-8">
-    <h2><%= event.title %></h2>
-    <% if (event.image) { %>
-      <img src="<%= event.image %>" class="img-fluid mb-3" />
-    <% } %>
-    <p><%= event.description %></p>
-    <p><strong>วันที่:</strong> <%= event.date ? event.date.toLocaleString() : '-' %></p>
-    <p><strong>สถานที่:</strong> <%= event.location || '-' %></p>
-    <p><strong>ราคา:</strong> ฿<%= event.price %></p>
-    <p><strong>ตั๋วคงเหลือ:</strong> <%= event.totalTickets - event.soldTickets %></p>
-    <% if (typeof error !== 'undefined') { %>
-      <div class="alert alert-danger"><%= error %></div>
-    <% } %>
+  <div class="row">
+    <div class="col-md-8">
+      <h2>
+        <%= event.title %>
+      </h2>
+      <% if (event.image) { %>
+        <img src="<%= event.image %>" class="img-fluid mb-3" />
+        <% } %>
+          <p>
+            <%= event.description %>
+          </p>
+          <p><strong>วันที่:</strong>
+            <%= event.date ? event.date.toLocaleString() : '-' %>
+          </p>
+          <p><strong>สถานที่:</strong>
+            <%= event.location || '-' %>
+          </p>
+          <p><strong>ราคา:</strong> ฿<%= event.price %>
+          </p>
+          <p><strong>ตั๋วคงเหลือ:</strong>
+            <%= event.totalTickets - event.soldTickets %>
+          </p>
+          <% if (typeof error !=='undefined' ) { %>
+            <div class="alert alert-danger">
+              <%= error %>
+            </div>
+            <% } %>
+              <p><strong>วันที่เริ่มงาน:</strong>
+                <%= event.startDate ? event.startDate.toLocaleString('th-TH', { dateStyle: 'long' , timeStyle: 'short'
+                  }) : '-' %>
+              </p>
 
-    <% if (currentUser.role === 'organizer') { %>
-      <b>คุณไม่สามารถซื้อได้ ใน Role ของ organizer</b>
-    <% } else if(currentUser){ %>
-        <form action="/events/<%= event._id %>/book" method="POST" class="row g-2 align-items-center">
-        <div class="col-auto">
-          <input type="number" name="quantity" min="1" class="form-control" value="1" style="width:100px;">
-        </div>
-        <div class="col-auto">
-          <button class="btn btn-success">จอง/ซื้อ (จำลอง)</button>
-        </div>
-      </form>
-     <% } else { %>
-      <p>กรุณา <a href="/login">เข้าสู่ระบบ</a> เพื่อจองตั๋ว</p>
-    <% } %>
-  </div>
+              <p><strong>วันที่สิ้นสุด:</strong>
+                <%= event.endDate ? event.endDate.toLocaleString('th-TH', { dateStyle: 'long' , timeStyle: 'short' })
+                  : '-' %>
+              </p>
 
-  <div class="col-md-4">
-    <h5>ผู้จัดงาน</h5>
-    <p><%= event.organizer ? event.organizer.name : '-' %></p>
+              <!-- ✅ นาฬิกานับถอยหลัง -->
+              <% if (event.startDate && new Date(event.startDate)> new Date()) { %>
+                <div class="alert alert-info mt-3">
+                  <strong>นับถอยหลังถึงวันเริ่มงาน:</strong>
+                  <span id="countdown" class="fw-bold"></span>
+                </div>
+
+                <script>
+                  const countdownElem = document.getElementById('countdown');
+                  const startTime = new Date("<%= event.startDate.toISOString() %>").getTime();
+
+                  function updateCountdown() {
+                    const now = new Date().getTime();
+                    const diff = startTime - now;
+
+                    if (diff <= 0) {
+                      countdownElem.textContent = "เริ่มงานแล้ว!";
+                      clearInterval(timer);
+                      return;
+                    }
+
+                    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+                    countdownElem.textContent = `เหลืออีก ${days} วัน ${hours} ชั่วโมง ${minutes} นาที ${seconds} วินาที`;
+                  }
+
+                  updateCountdown();
+                  const timer = setInterval(updateCountdown, 1000);
+                </script>
+                <% } %>
+
+                  <% if (currentUser && currentUser.role==='organizer' ) { %>
+                    <b>คุณไม่สามารถซื้อได้ ใน Role ของ organizer</b>
+                    <% } else if(currentUser){ %>
+                      <form action="/events/<%= event._id %>/book" method="POST" class="row g-2 align-items-center">
+                        <div class="col-auto">
+                          <input type="number" name="quantity" min="1" class="form-control" value="1"
+                            style="width:100px;">
+                        </div>
+                        <div class="col-auto">
+                          <button class="btn btn-success">จอง/ซื้อ (จำลอง)</button>
+                        </div>
+                      </form>
+                      <% } else { %>
+                        <p>กรุณา <a href="/login">เข้าสู่ระบบ</a> เพื่อจองตั๋ว</p>
+                        <% } %>
+    </div>
+
+    <div class="col-md-4">
+      <h5>ผู้จัดงาน</h5>
+      <p>
+        <%= event.organizer ? event.organizer.name : '-' %>
+      </p>
+    </div>
   </div>
-</div>
-<%- include('../partials/footer') %>
+  <%- include('../partials/footer') %>

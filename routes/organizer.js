@@ -13,8 +13,8 @@ const upload = multer({
 
 router.get('/dashboard', isLoggedIn, isOrganizer, async (req, res) => {
   const events = await Event.find({ organizer: req.session.user._id });
-  
-  
+
+
   res.render('organizer/dashboard', { events });
 });
 
@@ -23,12 +23,18 @@ router.get('/events/new', isLoggedIn, isOrganizer, (req, res) => {
 });
 
 router.post('/events', isLoggedIn, isOrganizer, upload.single('image'), async (req, res) => {
-  const { title, description, date, location, totalTickets, price } = req.body;
+  const { title, description, startDate, endDate, location, totalTickets, price } = req.body;
   const image = req.file ? `/uploads/${req.file.filename}` : '';
   const event = new Event({
-    title, description, date: date ? new Date(date) : undefined,
-    location, totalTickets: parseInt(totalTickets) || 0, price: parseFloat(price) || 0,
-    image, organizer: req.session.user._id
+    title,
+    description,
+    startDate: startDate ? new Date(startDate) : undefined,
+    endDate: endDate ? new Date(endDate) : undefined,
+    location,
+    totalTickets: parseInt(totalTickets) || 0,
+    price: parseFloat(price) || 0,
+    image: req.file ? req.file.path : '',
+    organizer: req.session.user._id
   });
   await event.save();
   res.redirect('/organizer/dashboard');
@@ -64,14 +70,16 @@ router.put('/events/:id', isLoggedIn, isOrganizer, upload.single('image'), async
       return res.status(403).send('ไม่อนุญาตให้แก้ไขอีเวนต์นี้');
     }
 
-    const { title, description, date, location, totalTickets, price } = req.body;
-    if (req.file) event.image = `/uploads/${req.file.filename}`;
+    const { title, description, startDate, endDate, location, totalTickets, price } = req.body;
     event.title = title;
     event.description = description;
-    event.date = date ? new Date(date) : event.date;
+    event.startDate = startDate ? new Date(startDate) : event.startDate;
+    event.endDate = endDate ? new Date(endDate) : event.endDate;
     event.location = location;
     event.totalTickets = parseInt(totalTickets) || 0;
     event.price = parseFloat(price) || 0;
+
+    if (req.file) event.image = req.file.path;
 
     await event.save();
     res.redirect('/organizer/dashboard');

@@ -1,60 +1,70 @@
 <%- include('../partials/header') %>
-<h2><%= event && event._id ? 'แก้ไขอีเวนต์' : 'สร้างอีเวนต์ใหม่' %></h2>
+  <h2>
+    <%= event && event._id ? 'แก้ไขอีเวนต์' : 'สร้างอีเวนต์ใหม่' %>
+  </h2>
 
-<form action="<%= event && event._id ? '/organizer/events/' + event._id + '?_method=PUT' : '/organizer/events' %>" method="POST" enctype="multipart/form-data">
-  <div class="mb-3">
-    <label>ชื่อ</label>
-    <input class="form-control" name="title" value="<%= event.title || '' %>" required>
-  </div>
-  <div class="mb-3">
-    <label>รายละเอียด</label>
-    <textarea class="form-control" name="description"><%= event.description || '' %></textarea>
-  </div>
-  <div class="mb-3">
-    <label>รูปภาพ</label>
-    <input type="file" class="form-control" name="image">
-    <% if (event.image) { %>
-    <img src="<%= event.image %>" style="max-height:120px; margin-top:8px;">
-    <% } %>
-  </div>
-  <div class="mb-3">
-    <label>วันที่</label>
-    <input type="datetime-local" class="form-control" name="date" id="eventDate" value="<%= event.date ? new Date(event.date).toISOString().slice(0,16) : '' %>" required>
-  </div>
-  <div class="mb-3">
-    <label>สถานที่</label>
-    <input class="form-control" name="location" value="<%= event.location || '' %>">
-  </div>
-  <div class="mb-3">
-    <label>จำนวนบัตรทั้งหมด</label>
-    <input type="number" class="form-control" name="totalTickets" value="<%= event.totalTickets || 0 %>" min="<%= event.soldTickets %>">
-    <p style="color: rgb(255, 0, 0);">ห้ามให้ต่ำกว่าคนซื้อปัจจุบัน : <%= event.soldTickets || 0 %> คน</p>
-  </div>
-  <div class="mb-3">
-    <label>ราคา (บาท)</label>
-    <input type="number" class="form-control" name="price" step="0.01" value="<%= event.price || 0 %>">
-  </div>
-  <button class="btn btn-success">บันทึก</button>
-</form>
-<script>
-  // ห้ามเลือกวันและเวลาย้อนหลัง
-  const dateInput = document.getElementById('eventDate');
+  <form action="<%= event && event._id ? '/organizer/events/' + event._id + '?_method=PUT' : '/organizer/events' %>"
+    method="POST" enctype="multipart/form-data">
+    <div class="mb-3">
+      <label>ชื่อ</label>
+      <input class="form-control" name="title" value="<%= event.title || '' %>" required>
+    </div>
+    <div class="mb-3">
+      <label>รายละเอียด</label>
+      <textarea class="form-control" name="description"><%= event.description || '' %></textarea>
+    </div>
+    <div class="mb-3">
+      <label>รูปภาพ</label>
+      <input type="file" class="form-control" name="image">
+      <% if (event.image) { %>
+        <img src="<%= event.image %>" style="max-height:120px; margin-top:8px;">
+        <% } %>
+    </div>
+    <div class="mb-3">
+      <label>วันและเวลาเริ่มต้น</label>
+      <input type="datetime-local" class="form-control" name="startDate"
+        value="<%= event.startDate ? new Date(event.startDate).toISOString().slice(0,16) : '' %>">
+    </div>
+    <div class="mb-3">
+      <label>วันและเวลาสิ้นสุด</label>
+      <input type="datetime-local" class="form-control" name="endDate"
+        value="<%= event.endDate ? new Date(event.endDate).toISOString().slice(0,16) : '' %>">
+    </div>
+    <div class="mb-3">
+      <label>สถานที่</label>
+      <input class="form-control" name="location" value="<%= event.location || '' %>">
+    </div>
+    <div class="mb-3">
+      <label>จำนวนบัตรทั้งหมด</label>
+      <input type="number" class="form-control" name="totalTickets" value="<%= event.totalTickets || 0 %>"
+        min="<%= event.soldTickets %>">
+      <p style="color: rgb(255, 0, 0);">ห้ามให้ต่ำกว่าคนซื้อปัจจุบัน : <%= event.soldTickets || 0 %> คน</p>
+    </div>
+    <div class="mb-3">
+      <label>ราคา (บาท)</label>
+      <input type="number" class="form-control" name="price" step="0.01" value="<%= event.price || 0 %>">
+    </div>
+    <button class="btn btn-success">บันทึก</button>
+  </form>
+  <script>
+    // ห้ามเลือกวันและเวลาย้อนหลัง
+    const dateInput = document.getElementById('eventDate');
 
-  // คำนวณเวลาปัจจุบันในรูปแบบ YYYY-MM-DDTHH:mm
-  const now = new Date();
-  const localNow = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
-    .toISOString()
-    .slice(0, 16);
+    // คำนวณเวลาปัจจุบันในรูปแบบ YYYY-MM-DDTHH:mm
+    const now = new Date();
+    const localNow = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+      .toISOString()
+      .slice(0, 16);
 
-  // ตั้งค่าขั้นต่ำ (min)
-  dateInput.min = localNow;
+    // ตั้งค่าขั้นต่ำ (min)
+    dateInput.min = localNow;
 
-  // กันผู้ใช้พิมพ์หรือเลือกเวลาย้อนหลังเอง
-  dateInput.addEventListener('input', () => {
-    if (dateInput.value < localNow) {
-      alert('ห้ามเลือกวันเวลาย้อนหลัง');
-      dateInput.value = localNow;
-    }
-  });
-</script>
-<%- include('../partials/footer') %>
+    // กันผู้ใช้พิมพ์หรือเลือกเวลาย้อนหลังเอง
+    dateInput.addEventListener('input', () => {
+      if (dateInput.value < localNow) {
+        alert('ห้ามเลือกวันเวลาย้อนหลัง');
+        dateInput.value = localNow;
+      }
+    });
+  </script>
+  <%- include('../partials/footer') %>

@@ -8,7 +8,7 @@ const { isLoggedIn } = require('../middleware/auth');
 router.get('/', async (req, res) => {
   const q = req.query.q || '';
   const filter = q ? { title: new RegExp(q, 'i') } : {};
-  const events = await Event.find(filter).sort({ date: 1 }).populate('organizer');
+  const events = await Event.find(filter).sort({ startDate: 1 }).populate('organizer');
   res.render('events/list', { events, q });
 });
 
