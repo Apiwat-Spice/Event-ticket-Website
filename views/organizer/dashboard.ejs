@@ -1,28 +1,38 @@
-<%- include('../partials/header') %>
-<h2>Organizer Dashboard</h2>
-<a class="btn btn-primary mb-3" href="/organizer/events/new">สร้างอีเวนต์ใหม่</a>
+<%- include('../partials/head') %>
+</head>
+<body>
 
-<% if (events.length === 0) { %>
-<p>ยังไม่มีอีเวนต์</p>
-<% } else { %>
-<div class="list-group">
-  <% events.forEach(ev => { %>
-  <div class="list-group-item">
-    <div class="d-flex justify-content-between">
-      <div>
-        <h5><%= ev.title %></h5>
-        <p class="mb-0"><small>วันที่: <%= ev.date ? ev.date.toLocaleString() : '-' %> | ตั๋วขายแล้ว: <%= ev.soldTickets %> / <%= ev.totalTickets %></small></p>
+  <%- include('../partials/navbar') %>
+  <div class="container">
+
+    <h2>Organizer Dashboard</h2>
+    <a class="btn btn-primary mb-3" href="/organizer/events/new">สร้างอีเวนต์ใหม่</a>
+
+    <% if (events.length === 0) { %>
+    <p>ยังไม่มีอีเวนต์</p>
+    <% } else { %>
+    <div class="list-group">
+      <% events.forEach(ev => { %>
+      <div class="list-group-item">
+        <div class="d-flex justify-content-between">
+          <div>
+            <h5><%= ev.title %></h5>
+            <p class="mb-0"><small>วันที่: <%= ev.date ? ev.date.toLocaleString() : '-' %> | ตั๋วขายแล้ว: <%= ev.soldTickets %> / <%= ev.totalTickets %></small></p>
+          </div>
+          <div>
+            <a class="btn btn-sm btn-outline-secondary" href="/events/<%= ev._id %>">ดู</a>
+            <a class="btn btn-sm btn-primary" href="/organizer/events/<%= ev._id %>/edit">แก้ไข</a>
+            <form action="/organizer/events/<%= ev._id %>?_method=DELETE" method="POST" style="display:inline-block">
+              <button class="btn btn-sm btn-danger" onclick="return confirm('ลบอีเวนต์?')">ลบ</button>
+            </form>
+          </div>
+        </div>
       </div>
-      <div>
-        <a class="btn btn-sm btn-outline-secondary" href="/events/<%= ev._id %>">ดู</a>
-        <a class="btn btn-sm btn-primary" href="/organizer/events/<%= ev._id %>/edit">แก้ไข</a>
-        <form action="/organizer/events/<%= ev._id %>?_method=DELETE" method="POST" style="display:inline-block">
-          <button class="btn btn-sm btn-danger" onclick="return confirm('ลบอีเวนต์?')">ลบ</button>
-        </form>
-      </div>
+      <% }) %>
     </div>
+    <% } %>
   </div>
-  <% }) %>
-</div>
-<% } %>
-<%- include('../partials/footer') %>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

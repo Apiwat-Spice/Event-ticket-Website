@@ -36,7 +36,7 @@ router.post('/events', isLoggedIn, isOrganizer, upload.single('image'), async (r
 
 router.get('/events/:id/edit', isLoggedIn, isOrganizer, async (req, res) => {
   const event = await Event.findById(req.params.id);
-  if (!event) return res.status(404).send('ไม่พบอีเวนต์');
+  if (!event) return res.status(404).send('ไม่พบอีเวนต์2');
   if (String(event.organizer) !== String(req.session.user._id)) return res.status(403).send('ไม่อนุญาต');
   res.render('organizer/event_form', { event });
 });
@@ -44,7 +44,7 @@ router.get('/events/:id/edit', isLoggedIn, isOrganizer, async (req, res) => {
 router.delete('/events/:id', isLoggedIn, isOrganizer, async (req, res) => {
   try {
     const event = await Event.findById(req.params.id);
-    if (!event) return res.status(404).send('ไม่พบอีเวนต์');
+    if (!event) return res.status(404).send('ไม่พบอีเวนต์3');
     if (String(event.organizer) !== String(req.session.user._id)) {
       return res.status(403).send('ไม่อนุญาตให้ลบอีเวนต์นี้');
     }
@@ -59,7 +59,7 @@ router.delete('/events/:id', isLoggedIn, isOrganizer, async (req, res) => {
 router.put('/events/:id', isLoggedIn, isOrganizer, upload.single('image'), async (req, res) => {
   try {
     const event = await Event.findById(req.params.id);
-    if (!event) return res.status(404).send('ไม่พบอีเวนต์');
+    if (!event) return res.status(404).send('ไม่พบอีเวนต์1');
     if (String(event.organizer) !== String(req.session.user._id)) {
       return res.status(403).send('ไม่อนุญาตให้แก้ไขอีเวนต์นี้');
     }

@@ -14,7 +14,7 @@ router.get('/', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
   const event = await Event.findById(req.params.id).populate('organizer');
-  if (!event) return res.status(404).send('ไม่พบอีเวนต์');
+  if (!event) return res.status(404).send('ไม่พบอีเวนต์4');
   res.render('events/detail', { event });
 });
 
@@ -24,7 +24,7 @@ router.post('/:id/book', isLoggedIn, async (req, res) => {
     const event = await Event.findById(req.params.id);
     const user = await User.findById(req.session.user._id);
 
-    if (!event) return res.status(404).send('ไม่พบอีเวนต์');
+    if (!event) return res.status(404).send('ไม่พบอีเวนต์5');
     if (!user) return res.status(404).send('ไม่พบผู้ใช้');
 
     const qty = parseInt(quantity) || 1;

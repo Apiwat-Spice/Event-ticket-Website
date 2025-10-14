@@ -153,6 +153,57 @@ router.post('/delcoin', isLoggedIn, async (req, res) => {
     res.status(500).send('เกิดข้อผิดพลาดในเซิร์ฟเวอร์');
   }
 });
+router.get('/editprofile', isLoggedIn, async (req, res) => {
+  try {
+    const userId = req.session.user._id;
+    const user = await User.findById(userId);
+
+    if (!user) return res.status(404).send('User not found');
+
+    // แยกชื่อก่อนส่งไป EJS
+    const parts = (user.name || '').trim().split(' ');
+    const firstname = parts[0] || '';
+    const lastname = parts.slice(1).join(' ') || '';
+
+    res.render('editprofile', { user, firstname, lastname });
+  } catch (err) {
+    console.error("edit profile GET error:", err);
+    res.status(500).send('Server error');
+  }
+});
+
+router.post('/editprofile', isLoggedIn, async (req, res) => {
+  try {
+    const userId = req.session.user._id;
+    const { firstname, lastname, Username, role, birthdate } = req.body;
+
+    // รวมชื่อให้เหมือน register
+    const fullName = `${firstname} ${lastname}`;
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        name: fullName,
+        username: Username,
+        role: role || 'attendee',
+        birthdate
+      },
+      { new: true }
+    );
+
+    // อัปเดต session ด้วย (จะได้โชว์ชื่อใหม่ทันที)
+    req.session.user.name = updatedUser.name;
+    req.session.user.role = updatedUser.role;
+    req.session.user.email = updatedUser.email;
+    const tickets = await Ticket.find({ buyer: req.session.user._id })
+      .populate('event')
+      .sort({ purchasedAt: -1 });
+    res.render('profile', { tickets }); // หรือจะ redirect ก็ได้ เช่น res.redirect('/wallet')
+  } catch (err) {
+    console.error("edit profile POST error:", err);
+    res.status(500).send('เกิดข้อผิดพลาดในเซิร์ฟเวอร์');
+  }
+});
 
 
 

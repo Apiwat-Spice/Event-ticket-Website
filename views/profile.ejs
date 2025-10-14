@@ -1,17 +1,29 @@
-<%- include('partials/header') %>
-<h2>โปรไฟล์ของฉัน</h2>
-<p><strong>ชื่อ:</strong> <%= currentUser.name %></p>
-<p><strong>อีเมล:</strong> <%= currentUser.email %></p>
-<hr>
-<h4>ประวัติการสั่งซื้อ</h4>
-<% tickets.forEach(t => { %>
-  <li class="list-group-item">
-    <% if (t.event) { %>
+<%- include('partials/head') %>
+</head>
+<body>
+
+  <%- include('partials/navbar') %>
+  <div class="container">
+
+
+    <h2>โปรไฟล์ของฉัน</h2>
+    <p><strong>ชื่อ:</strong> <%= currentUser.name %></p>
+    <p><strong>อีเมล:</strong> <%= currentUser.email %></p>
+    <button><a href="/editprofile">แก้ไขโปรไฟล์</a></button>
+    <hr>
+    <h4>ประวัติการสั่งซื้อ</h4>
+    <% tickets.forEach(t => { %>
+    <li class="list-group-item">
+      <% if (t.event) { %>
       <strong><%= t.event.title %></strong> - จำนวน <%= t.quantity %> ใบ
-    <% } else { %>
+      <% } else { %>
       <strong>(อีเวนต์นี้ถูกลบไปแล้ว)</strong> - จำนวน <%= t.quantity %> ใบ
-    <% } %>
-    <div><small>วันที่ซื้อ: <%= t.purchasedAt ? t.purchasedAt.toLocaleString() : '-' %></small></div>
-  </li>
-<% }) %>
-<%- include('partials/footer') %>
+      <% } %>
+      <div><small>วันที่ซื้อ: <%= t.purchasedAt ? t.purchasedAt.toLocaleString() : '-' %></small></div>
+    </li>
+    <% }) %>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

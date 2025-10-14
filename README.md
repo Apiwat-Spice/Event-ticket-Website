@@ -11,7 +11,7 @@ Default seed users:
 - attendee: att@example.com / password
 
 to do list 
-แก้ไขโปรไฟล์
+✅แก้ไขโปรไฟล์ ❗ตรวจบัค UI
 เพิ่มเงินให้ organizer
 ถอนตังค์ได้ UI
 ใช้คราวด์
