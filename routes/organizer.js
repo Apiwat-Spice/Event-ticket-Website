@@ -89,6 +89,25 @@ router.put('/events/:id', isLoggedIn, isOrganizer, upload.single('image'), async
   }
 });
 
+router.get('/events/:id/tickets', isLoggedIn, isOrganizer, async (req, res) => {
+  try {
+    const event = await Event.findById(req.params.id);
+    if (!event) return res.status(404).send('ไม่พบอีเวนต์');
+    if (String(event.organizer) !== String(req.session.user._id)) {
+      return res.status(403).send('คุณไม่สามารถดูอีเวนต์นี้ได้');
+    }
+
+    const tickets = await Ticket.find({ event: event._id })
+      .populate('buyer', 'name email')
+      .sort({ purchasedAt: -1 });
+
+    res.render('organizer/tickets', { event, tickets });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('เกิดข้อผิดพลาดในการดึงข้อมูลตั๋ว');
+  }
+});
+
 files_written = 0
 
 module.exports = router;

@@ -20,7 +20,7 @@
             <p class="mb-0"><small>วันที่: <%= ev.date ? ev.date.toLocaleString() : '-' %> | ตั๋วขายแล้ว: <%= ev.soldTickets %> / <%= ev.totalTickets %></small></p>
           </div>
           <div>
-            <a class="btn btn-sm btn-outline-secondary" href="/events/<%= ev._id %>">ดู</a>
+            <a class="btn btn-sm btn-info text-white" href="/organizer/events/<%= ev._id %>/tickets">ดูผู้ซื้อตั๋ว</a>
             <a class="btn btn-sm btn-primary" href="/organizer/events/<%= ev._id %>/edit">แก้ไข</a>
             <form action="/organizer/events/<%= ev._id %>?_method=DELETE" method="POST" style="display:inline-block">
               <button class="btn btn-sm btn-danger" onclick="return confirm('ลบอีเวนต์?')">ลบ</button>
