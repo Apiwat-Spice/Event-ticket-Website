@@ -7,13 +7,14 @@
 4. `npm run dev` or `npm start`
 
 Default seed users:
-- organizer: org@example.com / password
-- attendee: att@example.com / password
+- organizer: json wallhee / jz / org@example.com / 1 
+- attendee: json2 wallhee / jz2 / att@example.com / 2
 
 to do list 
-✅แก้ไขโปรไฟล์ ❗ตรวจบัค UI
-เพิ่มเงินให้ organizer
-ถอนตังค์ได้ UI
+✅แก้ไขโปรไฟล์ ตรวจบัค UI 
+✅โปรไฟล์เพิ่ม ส่วนดู ประวัติ event
+✅เพิ่มเงินให้ organizer เมื่อ att ซื้อ
+✅ถอนตังค์ได้ UI
 ใช้คราวด์
-organizer ดูว่าใครซื้อมาแล้วบ้าง
+
 

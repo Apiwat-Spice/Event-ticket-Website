@@ -1,20 +1,82 @@
 <%- include('partials/head') %>
 <style>
+  html,
+  body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    /* ป้องกัน scroll */
+  }
+
   body {
     background-color: #121212;
     color: white;
     font-family: 'Prompt', sans-serif;
+    margin: 0;
+  }
+
+  /* ให้การ์ดตรงกลางหน้าจอ */
+  .center-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 56px);
+    /* ลบความสูง navbar ออก */
+    padding-top: 20px;
+  }
+
+  .wallet-container {
+    position: relative;
+    width: 400px;
+    height: 420px;
+    overflow: hidden;
+
+  }
+
+  .wallet-card,
+  .wallet-card2 {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.6s ease;
+    box-shadow: 0 4px 10px rgba(255, 255, 255, 0.2);
+    opacity: 0;
+    transform: translateX(100%);
   }
 
   .wallet-card {
     background: linear-gradient(135deg, #ff7b00, #ff0080);
-    color: white;
-    border-radius: 20px;
-    padding: 2rem;
-    text-align: center;
-    box-shadow: 0 4px 10px rgba(255, 255, 255, 0.2);
-    max-width: 400px;
-    margin: 100px auto;
+  }
+
+  .wallet-card2 {
+    background: linear-gradient(185deg, #0932ff64, #00ff33);
+  }
+
+  /* การ์ดที่แสดงอยู่ */
+  .wallet-container.show-front .wallet-card {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .wallet-container.show-back .wallet-card2 {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  /* การ์ดที่หายไป */
+  .wallet-container.show-back .wallet-card {
+    opacity: 0;
+    transform: translateX(-5%);
+  }
+
+  .wallet-container.show-front .wallet-card2 {
+    opacity: 0;
+    transform: translateX(100%);
   }
 
   .coins {
@@ -38,39 +100,68 @@
     color: white;
   }
 
-  .container {
-    display: flex;
+  .toggle-btn {
+    background-color: #333;
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 10px;
+    margin-top: 25px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  .toggle-btn:hover {
+    background-color: #555;
   }
 </style>
 </head>
-<%- include('partials/navbar') %>
 
 <body>
-  <div class="container">
-    <div class="wallet-card">
-      <h2>กระเป๋าเหรียญของ</h2>
-      <h2><%= user.name %></h2>
-      <p class="coins"><%= user.coins %> Coins</p>
-      <form action="/addcoin" method="POST">
-        <label for="coin">กรอกจำนวนเหรียญ (1 บาท = 1 Coin)</label>
-        <input type="number" id="coin" name="coin" required class="form-control mt-2 mb-3">
-        <button type="submit" class="btn-add">เติมเหรียญ</button>
+  <%- include('partials/navbar') %>
 
-      </form>
-    </div>
-    <div class="wallet-card">
-      <h2>กระเป๋าเหรียญของ</h2>
-      <h2><%= user.name %></h2>
-      <p class="coins"><%= user.coins %> Coins</p>
-      <form action="/delcoin" method="POST">
-        <label for="coin">กรอกจำนวนเหรียญ (1 บาท = 1 Coin)</label>
-        <input type="number" id="coin" name="coin" required class="form-control mt-2 mb-3">
-        <button type="submit" class="btn-add">ถอนเงิน</button>
+  <div class="center-container">
+    <div class="wallet-container show-front" id="walletContainer">
+      <!-- หน้าการ์ด เติมเหรียญ -->
+      <div class="wallet-card">
+        <h2>กระเป๋าเหรียญของ</h2>
+        <h2><%= user.name %></h2>
+        <p class="coins"><%= user.coins %> Coins</p>
+        <form action="/addcoin" method="POST">
+          <label for="coin">กรอกจำนวนเหรียญ (1 บาท = 1 Coin)</label>
+          <input type="number" id="coin" name="coin" required class="form-control mt-2 mb-3">
+          <button type="submit" class="btn-add">เติมเหรียญ</button>
+        </form>
+      </div>
 
-      </form>
+      <!-- หลังการ์ด ถอนเหรียญ -->
+      <div class="wallet-card2">
+        <h2>กระเป๋าเหรียญของ</h2>
+        <h2><%= user.name %></h2>
+        <p class="coins"><%= user.coins %> Coins</p>
+        <form action="/delcoin" method="POST">
+          <label for="coin">กรอกจำนวนเหรียญ (1 บาท = 1 Coin)</label>
+          <input type="number" id="coin" name="coin" required class="form-control mt-2 mb-3">
+          <button type="submit" class="btn-add">ถอนเงิน</button>
+        </form>
+      </div>
     </div>
+
+    <button class="toggle-btn" id="toggleButton">ไปหน้า ถอนเหรียญ</button>
   </div>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    const container = document.getElementById('walletContainer');
+    const button = document.getElementById('toggleButton');
+    let showBack = false;
+
+    button.addEventListener('click', () => {
+      showBack = !showBack;
+      container.classList.toggle('show-front', !showBack);
+      container.classList.toggle('show-back', showBack);
+      button.textContent = showBack ? 'กลับไปเติมเหรียญ' : 'ไปหน้า ถอนเหรียญ';
+    });
+  </script>
 </body>
 
 </html>

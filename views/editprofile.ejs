@@ -26,18 +26,10 @@
       </div>
 
       <div class="mb-3">
-        <label for="email">อีเมล (Email)</label>
+        <label for="email">อีเมล (Email) </label>
         <input class="form-control" name="email" type="email" id="email" value="<%= user.email %>" readonly>
+        <b>ไม่สามารถแก้ไขได้</b>
       </div>
-
-      <div class="mb-3">
-        <label>บทบาท (Role)</label>
-        <select name="role" class="form-select">
-          <option value="attendee" <%= user.role === 'attendee' ? 'selected' : '' %>>ผู้เข้าร่วม (Attendee)</option>
-          <option value="organizer" <%= user.role === 'organizer' ? 'selected' : '' %>>ผู้จัดงาน (Organizer)</option>
-        </select>
-      </div>
-
       <div class="mb-3">
         <label for="birthdate">วันเกิด (Birthdate)</label>
         <input class="form-control" name="birthdate" type="date" id="birthdate" value="<%= user.birthdate ? user.birthdate.toISOString().split('T')[0] : '' %>" required>

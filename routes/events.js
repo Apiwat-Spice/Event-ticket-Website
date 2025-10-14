@@ -24,7 +24,7 @@ router.post('/:id/book', isLoggedIn, async (req, res) => {
     const event = await Event.findById(req.params.id);
     const user = await User.findById(req.session.user._id);
 
-    if (!event) return res.status(404).send('ไม่พบอีเวนต์5');
+    if (!event) return res.status(404).send('ไม่พบอีเวนต์');
     if (!user) return res.status(404).send('ไม่พบผู้ใช้');
 
     const qty = parseInt(quantity) || 1;
@@ -40,7 +40,7 @@ router.post('/:id/book', isLoggedIn, async (req, res) => {
       return res.render('events/detail', { event, error: 'เหรียญไม่เพียงพอ กรุณาเติมเหรียญก่อนจอง' });
     }
 
-    // ✅ หักเหรียญ
+    // ✅ หักเหรียญผู้ซื้อ
     user.coins -= totalPrice;
 
     // ✅ สร้างตั๋วใหม่
@@ -54,7 +54,14 @@ router.post('/:id/book', isLoggedIn, async (req, res) => {
     // ✅ อัปเดตยอดขายอีเวนต์
     event.soldTickets += qty;
 
-    // ✅ บันทึกข้อมูลทั้งหมด
+    // ✅ เพิ่มเงินให้ organizer
+    const organizer = await User.findById(event.organizer);
+    if (organizer) {
+      organizer.coins += totalPrice; // โอนไปเต็มจำนวน
+      await organizer.save();
+    }
+
+    // ✅ บันทึกข้อมูลผู้ซื้อและตั๋ว
     await Promise.all([user.save(), ticket.save(), event.save()]);
 
     res.redirect('/profile');
@@ -63,6 +70,7 @@ router.post('/:id/book', isLoggedIn, async (req, res) => {
     res.status(500).send('เกิดข้อผิดพลาดในเซิร์ฟเวอร์');
   }
 });
+
 
 
 module.exports = router;

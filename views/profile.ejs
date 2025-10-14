@@ -1,5 +1,11 @@
 <%- include('partials/head') %>
+<style>
+  a{
+    color: white;
+  }
+</style>
 </head>
+  
 <body>
 
   <%- include('partials/navbar') %>
@@ -9,7 +15,7 @@
     <h2>โปรไฟล์ของฉัน</h2>
     <p><strong>ชื่อ:</strong> <%= currentUser.name %></p>
     <p><strong>อีเมล:</strong> <%= currentUser.email %></p>
-    <button><a href="/editprofile">แก้ไขโปรไฟล์</a></button>
+    <button class="btn btn-dark"><a href="/editprofile">แก้ไขโปรไฟล์</a></button>
     <hr>
     <h4>ประวัติการสั่งซื้อ</h4>
     <% tickets.forEach(t => { %>

@@ -6,10 +6,16 @@ body {
     color: white;
 }
 
-
+a{
+    text-decoration: none;
+}
 .card .text-truncate {
     display: block;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+}
+
+a:hover{
+    font-weight: bold;
 }

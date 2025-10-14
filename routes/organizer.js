@@ -100,7 +100,7 @@ router.get('/events/:id/tickets', isLoggedIn, isOrganizer, async (req, res) => {
     const tickets = await Ticket.find({ event: event._id })
       .populate('buyer', 'name email')
       .sort({ purchasedAt: -1 });
-
+    
     res.render('organizer/tickets', { event, tickets });
   } catch (err) {
     console.error(err);

@@ -40,7 +40,7 @@
       <div class="mb-3">
         <label>จำนวนบัตรทั้งหมด</label>
         <input type="number" class="form-control" name="totalTickets" value="<%= event.totalTickets || 0 %>" min="<%= event.soldTickets %>">
-        <p style="color: rgb(255, 0, 0);">ห้ามให้ต่ำกว่าคนซื้อปัจจุบัน : <%= event.soldTickets || 0 %> คน</p>
+        <p style="color: rgb(0, 0, 0);">ไม่สามารถต่ำกว่าคนซื้อปัจจุบันได้ : <%= event.soldTickets || 0 %> คน</p>
       </div>
       <div class="mb-3">
         <label>ราคา (บาท)</label>

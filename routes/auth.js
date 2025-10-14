@@ -8,7 +8,6 @@ const { isLoggedIn } = require('../middleware/auth');
 
 router.get('/register', (req, res) => res.render('register'));
 router.post('/register', async (req, res) => {
-  console.log(req.body);
   const { firstname, lastname, Username, email, role, birthdate, password, Confirmpassword } = req.body;
 
   try {
@@ -45,20 +44,36 @@ router.post('/register', async (req, res) => {
 
 router.get('/login', (req, res) => res.render('login'));
 router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
+  const { username_or_email, password } = req.body; // ใช้แค่ 2 อย่าง
+
   try {
-    const user = await User.findOne({ email });
+    // ค้นหาผู้ใช้โดย username หรือ email
+    const user = await User.findOne({
+      $or: [
+        { email: username_or_email },
+        { username: username_or_email }
+      ]
+    });
+
     if (!user) return res.render('login', { error: 'ไม่พบผู้ใช้' });
+
     const ok = await user.verifyPassword(password);
     if (!ok) return res.render('login', { error: 'รหัสผ่านไม่ถูกต้อง' });
+
+    // เก็บข้อมูล session
     req.session.user = { _id: user._id, name: user.name, role: user.role, email: user.email };
+
+    // redirect ตาม role
     if (user.role === 'organizer') return res.redirect('/organizer/dashboard');
     res.redirect('/events');
+
   } catch (err) {
     console.error(err);
     res.render('login', { error: 'เกิดข้อผิดพลาด' });
   }
 });
+
+
 
 router.get('/logout', (req, res) => {
   req.session.destroy(() => res.redirect('/login'));
