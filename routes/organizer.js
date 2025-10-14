@@ -13,6 +13,8 @@ const upload = multer({
 
 router.get('/dashboard', isLoggedIn, isOrganizer, async (req, res) => {
   const events = await Event.find({ organizer: req.session.user._id });
+  
+  
   res.render('organizer/dashboard', { events });
 });
 

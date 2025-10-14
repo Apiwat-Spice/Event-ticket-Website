@@ -92,7 +92,7 @@ router.get('/wallet', isLoggedIn, async (req, res) => {
   }
 });
 
-router.post('/wallet', isLoggedIn, async (req, res) => {
+router.post('/addcoin', isLoggedIn, async (req, res) => {
   try {
     const userId = req.session.user._id;
     const amount = parseInt(req.body.coin); // จำนวนเหรียญที่ผู้ใช้กรอก
@@ -120,4 +120,40 @@ router.post('/wallet', isLoggedIn, async (req, res) => {
     res.status(500).send('เกิดข้อผิดพลาดในเซิร์ฟเวอร์');
   }
 });
+router.post('/delcoin', isLoggedIn, async (req, res) => {
+  try {
+    const userId = req.session.user._id;
+    const amount = parseInt(req.body.coin); // จำนวนเหรียญที่ผู้ใช้กรอก
+
+    // ตรวจสอบค่าที่กรอก
+    if (isNaN(amount) || amount <= 0) {
+      return res.status(400).send('จำนวนเหรียญไม่ถูกต้อง');
+    }
+
+    // ดึงข้อมูลผู้ใช้จากฐานข้อมูล
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).send('ไม่พบผู้ใช้');
+    }
+
+    // ✅ ตรวจสอบว่าเหรียญพอไหม
+    if (user.coins < amount) {
+      return res.status(400).send(`เหรียญไม่พอในกระเป๋า (มี ${user.coins} เหรียญ)`);
+    }
+
+    // ✅ ลบเหรียญออก
+    user.coins -= amount;
+
+    await user.save(); // บันทึกข้อมูลกลับลงฐานข้อมูล
+
+    // render กลับหน้า wallet พร้อมยอดใหม่
+    res.render('wallet', { user });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('เกิดข้อผิดพลาดในเซิร์ฟเวอร์');
+  }
+});
+
+
+
 module.exports = router;

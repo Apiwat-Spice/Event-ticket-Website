@@ -9,3 +9,11 @@
 Default seed users:
 - organizer: org@example.com / password
 - attendee: att@example.com / password
+
+to do list 
+แก้ไขโปรไฟล์
+เพิ่มเงินให้ organizer
+ถอนตังค์ได้ UI
+ใช้คราวด์
+organizer ดูว่าใครซื้อมาแล้วบ้าง
+

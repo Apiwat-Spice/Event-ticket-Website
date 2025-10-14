@@ -45,6 +45,9 @@
       background-color: #ff7b00;
       color: white;
     }
+    .container{
+      display: flex;
+    }
   </style>
 </head>
 <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
@@ -70,15 +73,29 @@
 </nav>
 
 <body>
-  <div class="wallet-card">
-    <h2>กระเป๋าเหรียญของ</h2>
-    <h2><%= user.name %></h2>
-    <p class="coins"><%= user.coins %> Coins</p>
-    <form action="/wallet" method="POST">
-      <label for="coin">กรอกจำนวนเหรียญ (1 บาท = 1 Coin)</label>
-      <input type="number" id="coin" name="coin" min="1" step="10" required class="form-control mt-2 mb-3">
-      <button type="submit" class="btn-add">เติมเหรียญ</button>
-    </form>
+  <div class="container">
+    <div class="wallet-card">
+      <h2>กระเป๋าเหรียญของ</h2>
+      <h2><%= user.name %></h2>
+      <p class="coins"><%= user.coins %> Coins</p>
+      <form action="/addcoin" method="POST">
+        <label for="coin">กรอกจำนวนเหรียญ (1 บาท = 1 Coin)</label>
+        <input type="number" id="coin" name="coin" required class="form-control mt-2 mb-3">
+        <button type="submit" class="btn-add">เติมเหรียญ</button>
+
+      </form>
+    </div>
+    <div class="wallet-card">
+      <h2>กระเป๋าเหรียญของ</h2>
+      <h2><%= user.name %></h2>
+      <p class="coins"><%= user.coins %> Coins</p>
+      <form action="/delcoin" method="POST">
+        <label for="coin">กรอกจำนวนเหรียญ (1 บาท = 1 Coin)</label>
+        <input type="number" id="coin" name="coin" required class="form-control mt-2 mb-3">
+        <button type="submit" class="btn-add">ถอนเงิน</button>
+
+      </form>
+    </div>
   </div>
 </body>
 
