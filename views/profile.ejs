@@ -53,18 +53,7 @@
       <h4>ประวัติการสั่งซื้อ</h4>
 
       <% if (tickets && tickets.length > 0) { %>
-        <!-- <ul class="list-group mb-4">
-          <% tickets.forEach(t => { %>
-            <li class="list-group-item">
-              <% if (t.event) { %>
-                <strong><%= t.event.title %></strong> - จำนวน <%= t.quantity %> ใบ
-                <div><small>วันที่ซื้อ: <%= t.purchasedAt ? t.purchasedAt.toLocaleString() : '-' %></small></div>
-              <% } else { %>
-                <strong>(อีเวนต์นี้ถูกลบไปแล้ว)</strong> - จำนวน <%= t.quantity %> ใบ
-              <% } %>
-            </li>
-          <% }) %>
-        </ul> -->
+       
 
         <div class="row">
           <% tickets.forEach(t => { %>
