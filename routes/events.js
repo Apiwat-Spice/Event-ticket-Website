@@ -5,6 +5,7 @@ const Event = require('../models/Event');
 const Ticket = require('../models/Ticket');
 const { isLoggedIn } = require('../middleware/auth');
 
+//get
 router.get('/', async (req, res) => {
   const q = req.query.q || '';
   const filter = q ? { title: new RegExp(q, 'i') } : {};
@@ -17,7 +18,7 @@ router.get('/:id', async (req, res) => {
   if (!event) return res.status(404).send('ไม่พบอีเวนต์4');
   res.render('events/detail', { event });
 });
-
+//post
 router.post('/:id/book', isLoggedIn, async (req, res) => {
   try {
     const { quantity } = req.body;

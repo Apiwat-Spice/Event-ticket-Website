@@ -10,18 +10,44 @@ const upload = multer({
   dest: path.join(__dirname, '..', 'public', 'uploads'),
   limits: { fileSize: 5 * 1024 * 1024 }
 });
-
+//get
 router.get('/dashboard', isLoggedIn, isOrganizer, async (req, res) => {
   const events = await Event.find({ organizer: req.session.user._id });
 
 
   res.render('organizer/dashboard', { events });
 });
-
 router.get('/events/new', isLoggedIn, isOrganizer, (req, res) => {
   res.render('organizer/event_form', { event: {} });
 });
 
+router.get('/events/:id/tickets', isLoggedIn, isOrganizer, async (req, res) => {
+  try {
+    const event = await Event.findById(req.params.id);
+    if (!event) return res.status(404).send('ไม่พบอีเวนต์');
+    if (String(event.organizer) !== String(req.session.user._id)) {
+      return res.status(403).send('คุณไม่สามารถดูอีเวนต์นี้ได้');
+    }
+
+    const tickets = await Ticket.find({ event: event._id })
+      .populate('buyer', 'name email')
+      .sort({ purchasedAt: -1 });
+
+    res.render('organizer/tickets', { event, tickets });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('เกิดข้อผิดพลาดในการดึงข้อมูลตั๋ว');
+  }
+});
+
+router.get('/events/:id/edit', isLoggedIn, isOrganizer, async (req, res) => {
+  const event = await Event.findById(req.params.id);
+  if (!event) return res.status(404).send('ไม่พบอีเวนต์2');
+  if (String(event.organizer) !== String(req.session.user._id)) return res.status(403).send('ไม่อนุญาต');
+  res.render('organizer/event_form', { event });
+});
+
+//post
 router.post('/events', isLoggedIn, isOrganizer, upload.single('image'), async (req, res) => {
   const { title, description, startDate, endDate, location, totalTickets, price } = req.body;
   const image = req.file ? `/uploads/${req.file.filename}` : '';
@@ -40,13 +66,7 @@ router.post('/events', isLoggedIn, isOrganizer, upload.single('image'), async (r
   res.redirect('/organizer/dashboard');
 });
 
-router.get('/events/:id/edit', isLoggedIn, isOrganizer, async (req, res) => {
-  const event = await Event.findById(req.params.id);
-  if (!event) return res.status(404).send('ไม่พบอีเวนต์2');
-  if (String(event.organizer) !== String(req.session.user._id)) return res.status(403).send('ไม่อนุญาต');
-  res.render('organizer/event_form', { event });
-});
-
+//del
 router.delete('/events/:id', isLoggedIn, isOrganizer, async (req, res) => {
   try {
     const event = await Event.findById(req.params.id);
@@ -62,6 +82,7 @@ router.delete('/events/:id', isLoggedIn, isOrganizer, async (req, res) => {
   }
 });
 
+//put
 router.put('/events/:id', isLoggedIn, isOrganizer, upload.single('image'), async (req, res) => {
   try {
     const event = await Event.findById(req.params.id);
@@ -89,24 +110,6 @@ router.put('/events/:id', isLoggedIn, isOrganizer, upload.single('image'), async
   }
 });
 
-router.get('/events/:id/tickets', isLoggedIn, isOrganizer, async (req, res) => {
-  try {
-    const event = await Event.findById(req.params.id);
-    if (!event) return res.status(404).send('ไม่พบอีเวนต์');
-    if (String(event.organizer) !== String(req.session.user._id)) {
-      return res.status(403).send('คุณไม่สามารถดูอีเวนต์นี้ได้');
-    }
-
-    const tickets = await Ticket.find({ event: event._id })
-      .populate('buyer', 'name email')
-      .sort({ purchasedAt: -1 });
-    
-    res.render('organizer/tickets', { event, tickets });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('เกิดข้อผิดพลาดในการดึงข้อมูลตั๋ว');
-  }
-});
 
 files_written = 0
 

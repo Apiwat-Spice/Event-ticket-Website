@@ -6,7 +6,86 @@ const Ticket = require('../models/Ticket');
 const Event = require('../models/Event');
 const { isLoggedIn } = require('../middleware/auth');
 
+//get
 router.get('/register', (req, res) => res.render('register'));
+router.get('/login', (req, res) => res.render('login'));
+router.get('/logout', (req, res) => {
+  req.session.destroy(() => res.redirect('/login'));
+});
+router.get('/profile', isLoggedIn, async (req, res) => {
+  const tickets = await Ticket.find({ buyer: req.session.user._id })
+    .populate('event')
+    .sort({ purchasedAt: -1 });
+  res.render('profile', { tickets });
+});
+router.get('/wallet', isLoggedIn, async (req, res) => {
+  try {
+    // สมมติว่ามีการเก็บ userId ใน session หลังจาก login แล้ว undefined
+    const userId = req.session.user._id;
+    if (!userId) {
+      return res.redirect('/login');
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).send('User not found');
+    }
+
+    res.render('wallet', { user });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server error');
+  }
+});
+router.get('/editprofile', isLoggedIn, async (req, res) => {
+  try {
+    const userId = req.session.user._id;
+    const user = await User.findById(userId);
+
+    if (!user) return res.status(404).send('User not found');
+
+    // แยกชื่อก่อนส่งไป EJS
+    const parts = (user.name || '').trim().split(' ');
+    const firstname = parts[0] || '';
+    const lastname = parts.slice(1).join(' ') || '';
+
+    res.render('editprofile', { user, firstname, lastname });
+  } catch (err) {
+    console.error("edit profile GET error:", err);
+    res.status(500).send('Server error');
+  }
+});
+
+//post
+router.post('/login', async (req, res) => {
+  const { username_or_email, password } = req.body; // ใช้แค่ 2 อย่าง
+
+  try {
+    // ค้นหาผู้ใช้โดย username หรือ email
+    const user = await User.findOne({
+      $or: [
+        { email: username_or_email },
+        { username: username_or_email }
+      ]
+    });
+
+    if (!user) return res.render('login', { error: 'ไม่พบผู้ใช้' });
+
+    const ok = await user.verifyPassword(password);
+    if (!ok) return res.render('login', { error: 'รหัสผ่านไม่ถูกต้อง' });
+
+    // เก็บข้อมูล session
+    req.session.user = { _id: user._id, name: user.name, role: user.role, email: user.email };
+
+    // redirect ตาม role
+    if (user.role === 'organizer') return res.redirect('/organizer/dashboard');
+    res.redirect('/events');
+
+  } catch (err) {
+    console.error(err);
+    res.render('login', { error: 'เกิดข้อผิดพลาด' });
+  }
+});
 router.post('/register', async (req, res) => {
   const { firstname, lastname, Username, email, role, birthdate, password, Confirmpassword } = req.body;
 
@@ -40,73 +119,6 @@ router.post('/register', async (req, res) => {
     res.render('register', { error: 'เกิดข้อผิดพลาด' });
   }
 });
-
-
-router.get('/login', (req, res) => res.render('login'));
-router.post('/login', async (req, res) => {
-  const { username_or_email, password } = req.body; // ใช้แค่ 2 อย่าง
-
-  try {
-    // ค้นหาผู้ใช้โดย username หรือ email
-    const user = await User.findOne({
-      $or: [
-        { email: username_or_email },
-        { username: username_or_email }
-      ]
-    });
-
-    if (!user) return res.render('login', { error: 'ไม่พบผู้ใช้' });
-
-    const ok = await user.verifyPassword(password);
-    if (!ok) return res.render('login', { error: 'รหัสผ่านไม่ถูกต้อง' });
-
-    // เก็บข้อมูล session
-    req.session.user = { _id: user._id, name: user.name, role: user.role, email: user.email };
-
-    // redirect ตาม role
-    if (user.role === 'organizer') return res.redirect('/organizer/dashboard');
-    res.redirect('/events');
-
-  } catch (err) {
-    console.error(err);
-    res.render('login', { error: 'เกิดข้อผิดพลาด' });
-  }
-});
-
-
-
-router.get('/logout', (req, res) => {
-  req.session.destroy(() => res.redirect('/login'));
-});
-
-router.get('/profile', isLoggedIn, async (req, res) => {
-  const tickets = await Ticket.find({ buyer: req.session.user._id })
-    .populate('event')
-    .sort({ purchasedAt: -1 });
-  res.render('profile', { tickets });
-});
-
-
-router.get('/wallet', isLoggedIn, async (req, res) => {
-  try {
-    // สมมติว่ามีการเก็บ userId ใน session หลังจาก login แล้ว undefined
-    const userId = req.session.user._id;
-    if (!userId) {
-      return res.redirect('/login');
-    }
-
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).send('User not found');
-    }
-
-    res.render('wallet', { user });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Server error');
-  }
-});
-
 router.post('/addcoin', isLoggedIn, async (req, res) => {
   try {
     const userId = req.session.user._id;
@@ -168,25 +180,6 @@ router.post('/delcoin', isLoggedIn, async (req, res) => {
     res.status(500).send('เกิดข้อผิดพลาดในเซิร์ฟเวอร์');
   }
 });
-router.get('/editprofile', isLoggedIn, async (req, res) => {
-  try {
-    const userId = req.session.user._id;
-    const user = await User.findById(userId);
-
-    if (!user) return res.status(404).send('User not found');
-
-    // แยกชื่อก่อนส่งไป EJS
-    const parts = (user.name || '').trim().split(' ');
-    const firstname = parts[0] || '';
-    const lastname = parts.slice(1).join(' ') || '';
-
-    res.render('editprofile', { user, firstname, lastname });
-  } catch (err) {
-    console.error("edit profile GET error:", err);
-    res.status(500).send('Server error');
-  }
-});
-
 router.post('/editprofile', isLoggedIn, async (req, res) => {
   try {
     const userId = req.session.user._id;
@@ -219,7 +212,5 @@ router.post('/editprofile', isLoggedIn, async (req, res) => {
     res.status(500).send('เกิดข้อผิดพลาดในเซิร์ฟเวอร์');
   }
 });
-
-
 
 module.exports = router;

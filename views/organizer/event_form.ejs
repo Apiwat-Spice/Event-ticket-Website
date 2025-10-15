@@ -20,7 +20,7 @@
       </div>
       <div class="mb-3">
         <label>รูปภาพ</label>
-        <input type="file" class="form-control" name="image">
+        <input type="file" class="form-control" name="image" accept="image/*">
         <% if (event.image) { %>
         <img src="<%= event.image %>" style="max-height:120px; margin-top:8px;">
         <% } %>

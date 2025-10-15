@@ -1,5 +1,5 @@
 //npm init -y
-//npm install express ejs mongoose dotenv bcrypt express-session connect-mongo method-override multer
+//npm install express ejs mongoose dotenv bcrypt express-session connect-mongo method-override multer cloudinary
 
 require('dotenv').config();
 const express = require('express');
@@ -12,6 +12,7 @@ const path = require('path');
 const authRoutes = require('./routes/auth');
 const eventRoutes = require('./routes/events');
 const organizerRoutes = require('./routes/organizer');
+const cloudinary = require('cloudinary').v2
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -38,6 +39,11 @@ const PORT = process.env.PORT || 3000;
     saveUninitialized: false,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URI })
   }));
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_KEY_SECRET
+  })
 
   // make user available in views
   app.use((req, res, next) => {
