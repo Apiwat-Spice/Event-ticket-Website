@@ -1,58 +1,39 @@
 <%- include('../partials/head') %>
 
-<h2>ระบบเช็กอินหน้างาน</h2>
-<p>สแกน QR Code ของตั๋วเพื่อตรวจสอบ</p>
+<div class="container mt-4">
+  <h2>เช็กอินตั๋วด้วย QR Code / Ticket ID</h2>
 
-<div class="border p-3 mb-3 text-center">
-  <video id="preview" width="300" height="300" style="border:1px solid #ccc;"></video>
+  <form id="checkinForm">
+    <div class="mb-3">
+      <label for="qrCodeId" class="form-label">วาง URL หรือ QR Ticket ID</label>
+      <input type="text" class="form-control" id="qrCodeId" placeholder="ใส่ QR URL หรือ Ticket ID" required>
+    </div>
+    <button type="submit" class="btn btn-primary">เช็กอิน</button>
+  </form>
+
+  <div id="result" class="mt-3"></div>
 </div>
 
-<div id="result" class="alert alert-secondary">ยังไม่มีข้อมูล</div>
-
-<script src="https://unpkg.com/html5-qrcode"></script>
 <script>
-  const resultBox = document.getElementById('result');
+document.getElementById('checkinForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  let input = document.getElementById('qrCodeId').value.trim();
 
-  function showMessage(msg, success = false) {
-    resultBox.className = success ? 'alert alert-success' : 'alert alert-danger';
-    resultBox.textContent = msg;
+  // ถ้าเป็น URL ให้เอา ticketId (ส่วนท้าย)
+  if(input.startsWith('http')){
+    const parts = input.split('/');
+    input = parts[parts.length - 1];
   }
 
-  async function checkTicket(qrData) {
-    try {
-      const response = await fetch(`/organizer/api/checkin/${qrData}`);
-      const data = await response.json();
-      if (data.success) {
-        showMessage(`✅ ${data.message}\nผู้ซื้อ: ${data.buyer}\nอีเวนต์: ${data.event}\nเวลา: ${data.time}`, true);
-      } else {
-        showMessage(`❌ ${data.message}`, false);
-      }
-    } catch (err) {
-      showMessage('เกิดข้อผิดพลาดในการเช็กอิน');
-    }
-  }
+  const res = await fetch(`/organizer/api/checkin/${input}`);
+  const data = await res.json();
 
-  const html5QrCode = new Html5Qrcode("preview");
-  Html5Qrcode.getCameras().then(devices => {
-    if (devices && devices.length) {
-      html5QrCode.start(
-        devices[0].id,
-        { fps: 10, qrbox: 250 },
-        decodedText => {
-          html5QrCode.stop().then(() => {
-            const qrValue = decodedText.replace('TICKET:', '').trim();
-            checkTicket(qrValue);
-            setTimeout(() => window.location.reload(), 3000); // โหลดใหม่เพื่อเช็กตั๋วถัดไป
-          });
-        },
-        errorMessage => {}
-      );
-    } else {
-      resultBox.textContent = 'ไม่พบกล้อง';
-    }
-  }).catch(err => {
-    resultBox.textContent = 'ไม่สามารถเข้าถึงกล้องได้';
-  });
+  const resultDiv = document.getElementById('result');
+  if(data.success){
+    resultDiv.innerHTML = `<div class="alert alert-success">${data.message} ของ ${data.buyer}</div>`;
+  } else {
+    resultDiv.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
+  }
+});
 </script>
 
-<%- include('../partials/footer') %>

@@ -125,6 +125,10 @@ router.delete('/events/:id', isLoggedIn, isOrganizer, async (req, res) => {
   }
 });
 
+router.get('/checkin', isLoggedIn, isOrganizer, (req, res) => {
+  res.render('organizer/checkin');
+});
+
 router.get('/api/checkin/:qrCodeId', isLoggedIn, isOrganizer, async (req, res) => {
   try {
     const ticket = await Ticket.findOne({ qrCodeId: req.params.qrCodeId }).populate('event buyer');
