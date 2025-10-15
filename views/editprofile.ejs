@@ -30,10 +30,6 @@
         <input class="form-control" name="email" type="email" id="email" value="<%= user.email %>" readonly>
         <b>ไม่สามารถแก้ไขได้</b>
       </div>
-      <div class="mb-3">
-        <label for="birthdate">วันเกิด (Birthdate)</label>
-        <input class="form-control" name="birthdate" type="date" id="birthdate" value="<%= user.birthdate ? user.birthdate.toISOString().split('T')[0] : '' %>" required>
-      </div>
 
       <button type="button" class="btn btn-secondary" onclick="window.location.href='/profile'">กลับ</button>
       <button type="submit" class="btn btn-primary">บันทึกการเปลี่ยนแปลง</button>

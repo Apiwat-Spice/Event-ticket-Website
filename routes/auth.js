@@ -202,7 +202,7 @@ router.post('/delcoin', isLoggedIn, async (req, res) => {
 router.post('/editprofile', isLoggedIn, async (req, res) => {
   try {
     const userId = req.session.user._id;
-    const { firstname, lastname, Username, role, birthdate } = req.body;
+    const { firstname, lastname, Username } = req.body;
 
     // รวมชื่อให้เหมือน register
     const fullName = `${firstname} ${lastname}`;
@@ -212,20 +212,18 @@ router.post('/editprofile', isLoggedIn, async (req, res) => {
       {
         name: fullName,
         username: Username,
-        role: role || 'attendee',
-        birthdate
       },
       { new: true }
     );
 
     // อัปเดต session ด้วย (จะได้โชว์ชื่อใหม่ทันที)
     req.session.user.name = updatedUser.name;
-    req.session.user.role = updatedUser.role;
     req.session.user.email = updatedUser.email;
     const tickets = await Ticket.find({ buyer: req.session.user._id })
       .populate('event')
       .sort({ purchasedAt: -1 });
-    res.render('profile', { tickets }); // หรือจะ redirect ก็ได้ เช่น res.redirect('/wallet')
+    res.redirect('/profile');
+    // res.render('wallet', { tickets }); // หรือจะ redirect ก็ได้ เช่น res.redirect('/wallet')
   } catch (err) {
     console.error("edit profile POST error:", err);
     res.status(500).send('เกิดข้อผิดพลาดในเซิร์ฟเวอร์');
