@@ -1,0 +1,58 @@
+<%- include('../partials/head') %>
+
+<h2>ระบบเช็กอินหน้างาน</h2>
+<p>สแกน QR Code ของตั๋วเพื่อตรวจสอบ</p>
+
+<div class="border p-3 mb-3 text-center">
+  <video id="preview" width="300" height="300" style="border:1px solid #ccc;"></video>
+</div>
+
+<div id="result" class="alert alert-secondary">ยังไม่มีข้อมูล</div>
+
+<script src="https://unpkg.com/html5-qrcode"></script>
+<script>
+  const resultBox = document.getElementById('result');
+
+  function showMessage(msg, success = false) {
+    resultBox.className = success ? 'alert alert-success' : 'alert alert-danger';
+    resultBox.textContent = msg;
+  }
+
+  async function checkTicket(qrData) {
+    try {
+      const response = await fetch(`/organizer/api/checkin/${qrData}`);
+      const data = await response.json();
+      if (data.success) {
+        showMessage(`✅ ${data.message}\nผู้ซื้อ: ${data.buyer}\nอีเวนต์: ${data.event}\nเวลา: ${data.time}`, true);
+      } else {
+        showMessage(`❌ ${data.message}`, false);
+      }
+    } catch (err) {
+      showMessage('เกิดข้อผิดพลาดในการเช็กอิน');
+    }
+  }
+
+  const html5QrCode = new Html5Qrcode("preview");
+  Html5Qrcode.getCameras().then(devices => {
+    if (devices && devices.length) {
+      html5QrCode.start(
+        devices[0].id,
+        { fps: 10, qrbox: 250 },
+        decodedText => {
+          html5QrCode.stop().then(() => {
+            const qrValue = decodedText.replace('TICKET:', '').trim();
+            checkTicket(qrValue);
+            setTimeout(() => window.location.reload(), 3000); // โหลดใหม่เพื่อเช็กตั๋วถัดไป
+          });
+        },
+        errorMessage => {}
+      );
+    } else {
+      resultBox.textContent = 'ไม่พบกล้อง';
+    }
+  }).catch(err => {
+    resultBox.textContent = 'ไม่สามารถเข้าถึงกล้องได้';
+  });
+</script>
+
+<%- include('../partials/footer') %>

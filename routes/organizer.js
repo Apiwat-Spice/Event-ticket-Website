@@ -125,4 +125,35 @@ router.delete('/events/:id', isLoggedIn, isOrganizer, async (req, res) => {
   }
 });
 
+router.get('/api/checkin/:qrCodeId', isLoggedIn, isOrganizer, async (req, res) => {
+  try {
+    const ticket = await Ticket.findOne({ qrCodeId: req.params.qrCodeId }).populate('event buyer');
+
+    if (!ticket) return res.json({ success: false, message: 'ไม่พบตั๋วนี้' });
+
+    // Organizer ต้องเป็นเจ้าของอีเวนต์นี้
+    if (String(ticket.event.organizer) !== String(req.session.user._id)) {
+      return res.json({ success: false, message: 'ไม่สามารถเช็กอินอีเวนต์นี้ได้' });
+    }
+
+    if (ticket.checkedIn) {
+      return res.json({ success: false, message: 'ตั๋วนี้ถูกเช็กอินไปแล้ว' });
+    }
+
+    ticket.checkedIn = true;
+    await ticket.save();
+
+    res.json({
+      success: true,
+      message: 'เช็กอินสำเร็จ!',
+      buyer: ticket.buyer.name,
+      event: ticket.event.title,
+      time: new Date().toLocaleString()
+    });
+  } catch (err) {
+    console.error(err);
+    res.json({ success: false, message: 'เกิดข้อผิดพลาด' });
+  }
+});
+
 module.exports = router;
