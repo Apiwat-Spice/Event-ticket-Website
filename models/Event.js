@@ -3,9 +3,9 @@ const mongoose = require('mongoose');
 const eventSchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: String,
-  image: String,
-  startDate: Date, 
-  endDate: Date,  
+  image: String, // เก็บ URL จาก Cloudinary
+  startDate: Date,
+  endDate: Date,
   location: String,
   totalTickets: { type: Number, default: 0 },
   price: { type: Number, default: 0 },

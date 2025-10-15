@@ -3,7 +3,9 @@ const router = express.Router();
 const User = require('../models/User');
 const Event = require('../models/Event');
 const Ticket = require('../models/Ticket');
-const { isLoggedIn } = require('../middleware/auth');
+const upload = require('../middleware/upload');
+const { uploadToCloudinary } = require('../middleware/cloudinary');
+const { isLoggedIn, isOrganizer } = require('../middleware/auth'); 
 
 //get
 router.get('/', async (req, res) => {
