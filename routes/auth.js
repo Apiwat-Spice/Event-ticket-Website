@@ -13,10 +13,29 @@ router.get('/logout', (req, res) => {
   req.session.destroy(() => res.redirect('/login'));
 });
 router.get('/profile', isLoggedIn, async (req, res) => {
-  const tickets = await Ticket.find({ buyer: req.session.user._id })
-    .populate('event')
-    .sort({ purchasedAt: -1 });
-  res.render('profile', { tickets });
+  try {
+    const userId = req.session.user._id;
+    const currentUser = await User.findById(userId);
+
+    // ถ้าเป็น organizer → ดึงอีเวนต์ที่สร้าง
+    let events = [];
+    if (currentUser.role === 'organizer') {
+      events = await Event.find({ organizer: userId }).sort({ createdAt: -1 });
+    }
+
+    // ถ้าเป็น attendee → ดึงตั๋วที่ซื้อ
+    let tickets = [];
+    if (currentUser.role === 'attendee') {
+      tickets = await Ticket.find({ buyer: userId })
+        .populate('event')
+        .sort({ purchasedAt: -1 });
+    }
+
+    res.render('profile', { currentUser, tickets, events });
+  } catch (err) {
+    console.error("Profile error:", err);
+    res.status(500).send("เกิดข้อผิดพลาดในเซิร์ฟเวอร์");
+  }
 });
 router.get('/wallet', isLoggedIn, async (req, res) => {
   try {

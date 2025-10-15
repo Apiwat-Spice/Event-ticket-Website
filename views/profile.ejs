@@ -1,17 +1,23 @@
 <%- include('partials/head') %>
-  <style>
-    a {
-      color: white;
-    }
-  </style>
-  </head>
+<style>
+  a {
+    color: white;
+    text-decoration: none;
+  }
+</style>
+</head>
 
-  <body>
+<body>
+  <%- include('partials/navbar') %>
 
-    <%- include('partials/navbar') %>
-      <div class="container">
+  <div class="container mt-4">
 
+    <% if (!currentUser) { %>
+      <!-- Guest -->
+      <h3>กรุณาเข้าสู่ระบบเพื่อดูโปรไฟล์</h3>
+      <a href="/login" class="btn btn-primary mt-3">เข้าสู่ระบบ</a>
 
+<<<<<<< HEAD
         <h2>โปรไฟล์ของฉัน</h2>
 
         <p><strong>ชื่อ:</strong>
@@ -64,14 +70,80 @@
                             <% } else { %>
                               <div class="alert alert-secondary mt-2">ไม่มี QR Code</div>
                               <% } %>
-                    </div>
-                  </div>
-                </div>
-                <% }) %>
-            </div>
-            <% } %>
+=======
+    <% } else if (currentUser.role === 'organizer') { %>
+      <!-- Organizer -->
+      <h2>โปรไฟล์ Organizer</h2>
+      <p><strong>ชื่อ:</strong> <%= currentUser.name %></p>
+      <p><strong>อีเมล:</strong> <%= currentUser.email %></p>
+      <a href="/editprofile" class="btn btn-dark mb-3">แก้ไขโปรไฟล์</a>
+      <hr>
 
+      <h4>อีเวนต์ที่คุณสร้าง</h4>
+      <% if (events && events.length > 0) { %>
+        <ul class="list-group">
+          <% events.forEach(e => { %>
+            <li class="list-group-item">
+              <% if (e.image) { %>
+                <img src="<%= e.image %>" style="width:80px; height:50px; object-fit:cover; margin-right:10px;">
+              <% } %>
+              <strong><%= e.title %></strong>
+              <br>วันที่: <%= e.startDate ? e.startDate.toLocaleDateString() : '-' %> ถึง <%= e.endDate ? e.endDate.toLocaleDateString() : '-' %>
+            </li>
+          <% }) %>
+        </ul>
+      <% } else { %>
+        <p>คุณยังไม่ได้สร้างอีเวนต์เลย</p>
+      <% } %>
+
+    <% } else if (currentUser.role === 'attendee') { %>
+      <!-- Attendee -->
+      <h2>โปรไฟล์ของฉัน</h2>
+      <p><strong>ชื่อ:</strong> <%= currentUser.name %></p>
+      <p><strong>อีเมล:</strong> <%= currentUser.email %></p>
+      <a href="/editprofile" class="btn btn-dark mb-3">แก้ไขโปรไฟล์</a>
+      <hr>
+
+      <h4>ประวัติการสั่งซื้อ</h4>
+
+      <% if (tickets && tickets.length > 0) { %>
+       
+
+        <div class="row">
+          <% tickets.forEach(t => { %>
+            <div class="col-md-6 col-lg-4 mb-4">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title"><%= t.event ? t.event.title : '(อีเวนต์ถูกลบ)' %></h5>
+                  <p class="mb-1">จำนวน: <%= t.quantity %> ใบ</p>
+                  <p class="mb-1"><small>วันที่ซื้อ: <%= t.purchasedAt ? t.purchasedAt.toLocaleString() : '-' %></small></p>
+
+                  <% if (t.qrCodeData) { %>
+                    <div class="text-center mt-3">
+                      <img src="<%= t.qrCodeData %>" alt="QR Code" style="width: 120px; height: 120px;">
+                      <p class="text-muted mt-2 mb-0"><small>QR Ticket ID: <%= t.ticketCode %></small></p>
+>>>>>>> 5aa19e0907cf670269647949df210142240b871b
+                    </div>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+
+<<<<<<< HEAD
               <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   </body>
+=======
+      <% } else { %>
+        <p>คุณยังไม่ได้ซื้อบัตรใด ๆ</p>
+      <% } %>
+>>>>>>> 5aa19e0907cf670269647949df210142240b871b
 
-  </html>
+    <% } %> <!-- ปิด else if role -->
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
