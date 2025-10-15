@@ -49,7 +49,7 @@ router.post('/:id/book', isLoggedIn, async (req, res) => {
     user.coins -= totalPrice;
 
     const ticketId = uuidv4();
-    const qrData = `${req.protocol}://${req.get('host')}/checkin/${ticketId}`;
+    const qrData = `http://localhost:3000/organizer/api/checkin/${ticketId}`;
     const qrCodeImage = await QRCode.toDataURL(qrData); // ✅ สร้าง QR เป็น Base64
 
     // ✅ สร้างตั๋วใหม่
