@@ -49,6 +49,32 @@
       <button class="btn btn-success">บันทึก</button>
     </form>
     <script>
+      // เลือก input startDate และ endDate
+      const startInput = document.querySelector('input[name="startDate"]');
+      const endInput = document.querySelector('input[name="endDate"]');
+
+      // ฟังก์ชันตรวจสอบวันที่
+      function validateDates() {
+        const start = new Date(startInput.value);
+        const end = new Date(endInput.value);
+
+        if (start && end && end < start) {
+          alert('วันสิ้นสุดต้องมากกว่าหรือเท่ากับวันเริ่มต้น!');
+          endInput.value = startInput.value; // ตั้งวันสิ้นสุดให้เท่ากับวันเริ่ม
+        }
+      }
+
+      // เมื่อผู้ใช้เปลี่ยน startDate หรือ endDate ให้ตรวจสอบ
+      startInput.addEventListener('change', () => {
+        // ถ้า endDate น้อยกว่า startDate ให้ปรับอัตโนมัติ
+        if (endInput.value && new Date(endInput.value) < new Date(startInput.value)) {
+          endInput.value = startInput.value;
+        }
+      });
+
+      endInput.addEventListener('change', validateDates);
+    </script>
+    <script>
       // ห้ามเลือกวันและเวลาย้อนหลัง
       const dateInput = document.getElementById('eventDate');
 
