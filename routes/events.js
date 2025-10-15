@@ -5,7 +5,9 @@ const Event = require('../models/Event');
 const Ticket = require('../models/Ticket');
 const upload = require('../middleware/upload');
 const { uploadToCloudinary } = require('../middleware/cloudinary');
-const { isLoggedIn, isOrganizer } = require('../middleware/auth'); 
+const { isLoggedIn, isOrganizer } = require('../middleware/auth');
+const { v4: uuidv4 } = require('uuid');
+const QRCode = require('qrcode');
 
 //get
 router.get('/', async (req, res) => {
@@ -46,12 +48,18 @@ router.post('/:id/book', isLoggedIn, async (req, res) => {
     // ✅ หักเหรียญผู้ซื้อ
     user.coins -= totalPrice;
 
+    const ticketId = uuidv4();
+    const qrData = `${req.protocol}://${req.get('host')}/checkin/${ticketId}`;
+    const qrCodeImage = await QRCode.toDataURL(qrData); // ✅ สร้าง QR เป็น Base64
+
     // ✅ สร้างตั๋วใหม่
     const ticket = new Ticket({
       event: event._id,
       buyer: user._id,
       quantity: qty,
       totalPrice: totalPrice,
+      qrCodeId: ticketId,
+      qrCodeData: qrCodeImage
     });
 
     // ✅ อัปเดตยอดขายอีเวนต์
