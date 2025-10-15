@@ -1,4 +1,10 @@
 <%- include('../partials/head') %>
+<style>
+  a{
+    text-decoration: none;
+    color: white;
+  }
+</style>
 </head>
 
 <body>
@@ -46,6 +52,7 @@
         <label>ราคา (บาท)</label>
         <input type="number" class="form-control" name="price" step="0.01" value="<%= event.price || 0 %>">
       </div>
+      <button class="btn btn-dark" type="button" ><a href="/organizer/dashboard">back</a></button>
       <button class="btn btn-success">บันทึก</button>
     </form>
     <script>
