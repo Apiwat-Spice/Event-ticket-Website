@@ -66,7 +66,7 @@
                     <% if (t.qrCodeData) { %>
                       <div class="text-center mt-3">
                         <img src="<%= t.qrCodeData %>" alt="QR Code" style="width: 120px; height: 120px;">
-                        <p class="text-muted mt-2 mb-0"><small>QR Ticket ID: <%= t.ticketCode %></small></p>
+                        <p class="text-muted mt-2 mb-0"><small>QR Ticket ID: <%= t.qrCodeId %></small></p>
                         <% if (t.checkedIn) { %>
                           <span class="badge bg-success">✅ เช็กอินแล้ว</span>
                         <% } else { %>

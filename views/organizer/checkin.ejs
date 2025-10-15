@@ -30,9 +30,9 @@ document.getElementById('checkinForm').addEventListener('submit', async (e) => {
 
   const resultDiv = document.getElementById('result');
   if(data.success){
-    resultDiv.innerHTML = `<div class="alert alert-success">${data.message} ของ ${data.buyer}</div>`;
+    resultDiv.innerHTML = `<div class="alert alert-success">${data.message} ของ ${data.buyer} รหัส QrCode คือ  ${data.idticket} </div>`;
   } else {
-    resultDiv.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
+    resultDiv.innerHTML = `<div class="alert alert-danger">${data.message} รหัส QrCode คือ ${data.idticket}</div>`;
   }
 });
 </script>

@@ -21,9 +21,10 @@
           <th>ชื่อผู้ซื้อ</th>
           <th>อีเมล</th>
           <th>จำนวน</th>
-          <th>ราคารวม</th> 
+          <th>ราคารวม</th>
           <th>วันที่ซื้อ</th>
           <th>QR Code</th>
+          <th>สถานะ</th>
         </tr>
       </thead>
       <tbody>
@@ -33,13 +34,20 @@
           <td><%= t.buyer ? t.buyer.name : '(ผู้ใช้ถูกลบ)' %></td>
           <td><%= t.buyer ? t.buyer.email : '-' %></td>
           <td><%= t.quantity %></td>
-          <td><%= event.price*t.quantity %></td> 
+          <td><%= event.price*t.quantity %></td>
           <td><%= t.purchasedAt.toLocaleString() %></td>
           <td>
             <% if (t.qrCodeData) { %>
             <img src="<%= t.qrCodeData %>" alt="QR" style="width:60px; height:60px;">
             <% } else { %>
             -
+            <% } %>
+          </td>
+          <td>
+            <% if (t.checkedIn) { %>
+            <span class="badge bg-success">✅ เช็กอินแล้ว</span>
+            <% } else { %>
+            <span class="badge bg-warning text-dark">⏳ ยังไม่เช็กอิน</span>
             <% } %>
           </td>
         </tr>

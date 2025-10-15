@@ -33,47 +33,50 @@ router.post('/:id/book', isLoggedIn, async (req, res) => {
     if (!user) return res.status(404).send('ไม่พบผู้ใช้');
 
     const qty = parseInt(quantity) || 1;
-    const totalPrice = event.price * qty; // 💰 คำนวณราคารวม
+    const totalPrice = event.price * qty;
 
-    // ตรวจสอบจำนวนตั๋ว
     if ((event.soldTickets + qty) > event.totalTickets) {
       return res.render('events/detail', { event, error: 'ตั๋วไม่เพียงพอ' });
     }
 
-    // ตรวจสอบเหรียญในกระเป๋า
     if (user.coins < totalPrice) {
       return res.render('events/detail', { event, error: 'เหรียญไม่เพียงพอ กรุณาเติมเหรียญก่อนจอง' });
     }
 
-    // ✅ หักเหรียญผู้ซื้อ
+    // หักเหรียญผู้ซื้อ
     user.coins -= totalPrice;
 
-    const ticketId = uuidv4();
-    const qrData = `http://localhost:3000/organizer/api/checkin/${ticketId}`;
-    const qrCodeImage = await QRCode.toDataURL(qrData); // ✅ สร้าง QR เป็น Base64
+    // สร้างตั๋วแยกตามจำนวนที่ซื้อ
+    const tickets = [];
+    for (let i = 0; i < qty; i++) {
+      const ticketId = uuidv4();
+      const qrData = `http://localhost:3000/organizer/api/checkin/${ticketId}`;
+      const qrCodeImage = await QRCode.toDataURL(qrData);
 
-    // ✅ สร้างตั๋วใหม่
-    const ticket = new Ticket({
-      event: event._id,
-      buyer: user._id,
-      quantity: qty,
-      totalPrice: totalPrice,
-      qrCodeId: ticketId,
-      qrCodeData: qrCodeImage
-    });
+      const ticket = new Ticket({
+        event: event._id,
+        buyer: user._id,
+        quantity: 1, // ใบละ 1
+        totalPrice: event.price, // ราคาต่อตั๋ว
+        qrCodeId: ticketId,
+        qrCodeData: qrCodeImage
+      });
 
-    // ✅ อัปเดตยอดขายอีเวนต์
+      tickets.push(ticket);
+    }
+
+    // อัปเดตยอดขายอีเวนต์
     event.soldTickets += qty;
 
-    // ✅ เพิ่มเงินให้ organizer
+    // เพิ่มเงินให้ organizer
     const organizer = await User.findById(event.organizer);
     if (organizer) {
-      organizer.coins += totalPrice; // โอนไปเต็มจำนวน
+      organizer.coins += totalPrice;
       await organizer.save();
     }
 
-    // ✅ บันทึกข้อมูลผู้ซื้อและตั๋ว
-    await Promise.all([user.save(), ticket.save(), event.save()]);
+    // บันทึก user, event และทุก ticket
+    await Promise.all([user.save(), event.save(), ...tickets.map(t => t.save())]);
 
     res.redirect('/profile');
   } catch (err) {

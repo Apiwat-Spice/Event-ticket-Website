@@ -137,26 +137,32 @@ router.get('/api/checkin/:qrCodeId', isLoggedIn, isOrganizer, async (req, res) =
 
     // Organizer ต้องเป็นเจ้าของอีเวนต์นี้
     if (String(ticket.event.organizer) !== String(req.session.user._id)) {
-      return res.json({ success: false, message: 'ไม่สามารถเช็กอินอีเวนต์นี้ได้' });
+      return res.json({ success: false, message: 'ไม่สามารถเช็กอินอีเวนต์นี้ได้',idticket: ticket.qrCodeId });
     }
 
     if (ticket.checkedIn) {
-      return res.json({ success: false, message: 'ตั๋วนี้ถูกเช็กอินไปแล้ว' });
+      return res.json({ success: false, message: 'ตั๋วนี้ถูกเช็กอินไปแล้ว',idticket: ticket.qrCodeId });
     }
 
     ticket.checkedIn = true;
     await ticket.save();
+    console.log(ticket.qrCodeId);
 
     res.json({
       success: true,
       message: 'เช็กอินสำเร็จ!',
       buyer: ticket.buyer.name,
       event: ticket.event.title,
+      idticket: ticket.qrCodeId,
       time: new Date().toLocaleString()
     });
   } catch (err) {
     console.error(err);
-    res.json({ success: false, message: 'เกิดข้อผิดพลาด' });
+    res.json({
+      success: false,
+      message: 'เกิดข้อผิดพลาด',
+      idticket: ticket.qrCodeId
+    });
   }
 });
 
