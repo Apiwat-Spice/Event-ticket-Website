@@ -17,6 +17,9 @@ router.get('/profile', isLoggedIn, async (req, res) => {
     const userId = req.session.user._id;
     const currentUser = await User.findById(userId);
 
+    // รับค่าค้นหาจาก query string เช่น /profile?q=concert
+    const q = req.query.q ? req.query.q.trim().toLowerCase() : '';
+
     // ถ้าเป็น organizer → ดึงอีเวนต์ที่สร้าง
     let events = [];
     if (currentUser.role === 'organizer') {
@@ -29,14 +32,22 @@ router.get('/profile', isLoggedIn, async (req, res) => {
       tickets = await Ticket.find({ buyer: userId })
         .populate('event')
         .sort({ purchasedAt: -1 });
+
+      // ถ้ามีการค้นหา → กรองผลลัพธ์ใน server
+      if (q) {
+        tickets = tickets.filter(t =>
+          t.event && t.event.title.toLowerCase().includes(q)
+        );
+      }
     }
 
-    res.render('profile', { currentUser, tickets, events });
+    res.render('profile', { currentUser, tickets, events, q }); // ✅ ส่ง q ไปให้ EJS ด้วย
   } catch (err) {
     console.error("Profile error:", err);
     res.status(500).send("เกิดข้อผิดพลาดในเซิร์ฟเวอร์");
   }
 });
+
 router.get('/wallet', isLoggedIn, async (req, res) => {
   try {
     // สมมติว่ามีการเก็บ userId ใน session หลังจาก login แล้ว undefined

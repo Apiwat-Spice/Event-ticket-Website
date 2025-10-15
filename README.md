@@ -7,14 +7,16 @@
 4. `npm run dev` or `npm start`
 
 Default seed users:
-- organizer: json wallhee / jz / org@example.com / 1 
-- attendee: json2 wallhee / jz2 / att@example.com / 2
+- organizer: 
+    org1 / org1@example.com / 1 
+- attendee: 
+    jz1 / at1t@example.com / 1
 
-to do list 
+to do list===
 otp
 qrpromptpay
-searchตั๋ว
-chatbot
-สร้างevent ปุ่ม submit ดีเลย์ : ไม่งั้นสร้าง event2อัน
-รูปโปรไฟล์ผู้ใช้
-
+✅searchตั๋ว *1 
+chatbot 
+สร้างevent ปุ่ม submit ดีเลย์ : ไม่งั้นสร้าง event2อัน *2
+รูปโปรไฟล์ผู้ใช้ *3
+เจอบัค เข้า login -> logout -> guest -> login : แสดงปุ่ม signin/login ควรแสดง logout ทำวนไปเรื่อยเป็นบางครั้ง

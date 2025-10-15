@@ -18,81 +18,96 @@
     <a href="/login" class="btn btn-primary mt-3">เข้าสู่ระบบ</a>
 
     <% } else { %>
-      <!-- Logged-in user -->
-      <% if (currentUser.role === 'organizer') { %>
-        <!-- Organizer -->
-        <h2>โปรไฟล์ Organizer</h2>
-        <p><strong>ชื่อ:</strong> <%= currentUser.name %></p>
-        <p><strong>อีเมล:</strong> <%= currentUser.email %></p>
-        <a href="/editprofile" class="btn btn-dark mb-3">แก้ไขโปรไฟล์</a>
-        <hr>
+    <!-- Logged-in user -->
+    <% if (currentUser.role === 'organizer') { %>
+    <!-- Organizer -->
+    <h2>โปรไฟล์ Organizer</h2>
+    <p><strong>ชื่อ:</strong> <%= currentUser.name %></p>
+    <p><strong>อีเมล:</strong> <%= currentUser.email %></p>
+    <a href="/editprofile" class="btn btn-dark mb-3">แก้ไขโปรไฟล์</a>
+    <hr>
 
-        <h4>อีเวนต์ที่คุณสร้าง</h4>
-        <% if (events && events.length > 0) { %>
-          <ul class="list-group">
-            <% events.forEach(e => { %>
-              <li class="list-group-item">
-                <% if (e.image) { %>
-                  <img src="<%= e.image %>" style="width:80px; height:50px; object-fit:cover; margin-right:10px;">
-                <% } %>
-                <strong><%= e.title %></strong>
-                <br>วันที่: <%= e.startDate ? e.startDate.toLocaleDateString() : '-' %> ถึง <%= e.endDate ? e.endDate.toLocaleDateString() : '-' %>
-              </li>
-            <% }) %>
-          </ul>
-        <% } else { %>
-          <p>คุณยังไม่ได้สร้างอีเวนต์เลย</p>
+    <h4>อีเวนต์ที่คุณสร้าง</h4>
+    <% if (events && events.length > 0) { %>
+    <ul class="list-group">
+      <% events.forEach(e => { %>
+      <li class="list-group-item">
+        <% if (e.image) { %>
+        <img src="<%= e.image %>" style="width:80px; height:50px; object-fit:cover; margin-right:10px;">
         <% } %>
+        <strong><%= e.title %></strong>
+        <br>วันที่: <%= e.startDate ? e.startDate.toLocaleDateString() : '-' %> ถึง <%= e.endDate ? e.endDate.toLocaleDateString() : '-' %>
+      </li>
+      <% }) %>
+    </ul>
+    <% } else { %>
+    <p>คุณยังไม่ได้สร้างอีเวนต์เลย</p>
+    <% } %>
 
-      <% } else if (currentUser.role === 'attendee') { %>
-        <!-- Attendee -->
-        <h2>โปรไฟล์ของฉัน</h2>
-        <p><strong>ชื่อ:</strong> <%= currentUser.name %></p>
-        <p><strong>อีเมล:</strong> <%= currentUser.email %></p>
-        <a href="/editprofile" class="btn btn-dark mb-3">แก้ไขโปรไฟล์</a>
-        <hr>
+    <% } else if (currentUser.role === 'attendee') { %>
+    <!-- Attendee -->
+    <h2>โปรไฟล์ของฉัน</h2>
+    <p><strong>ชื่อ:</strong> <%= currentUser.name %></p>
+    <p><strong>อีเมล:</strong> <%= currentUser.email %></p>
+    <a href="/editprofile" class="btn btn-dark mb-3">แก้ไขโปรไฟล์</a>
+    <hr>
+    <form class="d-flex mb-3" method="GET" action="/profile">
+      <input name="q" class="form-control me-2" placeholder="ค้นหาอีเวนต์ที่ซื้อ..." value="<%= typeof q !== 'undefined' ? q : '' %>">
+      <button class="btn btn-outline-secondary">ค้นหา</button>
+    </form>
+    <hr>
 
-        <h4>ประวัติการสั่งซื้อ</h4>
-        <% if (tickets && tickets.length > 0) { %>
-          <div class="row">
-            <% tickets.forEach(t => { %>
-              <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card">
-                  <div class="card-body">
-                    <h5 class="card-title"><%= t.event ? t.event.title : '(อีเวนต์ถูกลบ)' %></h5>
-                    <p class="mb-1">จำนวน: <%= t.quantity %> ใบ</p>
-                    <p class="mb-1"><small>วันที่ซื้อ: <%= t.purchasedAt ? t.purchasedAt.toLocaleString() : '-' %></small></p>
+    <h4>ประวัติการสั่งซื้อ</h4>
+    <% 
+  let filteredTickets = tickets;
+  if (q && q.trim() !== '') {
+    filteredTickets = tickets.filter(t => 
+      t.event && t.event.title.toLowerCase().includes(q.toLowerCase())
+    );
+  }
+%>
 
-                    <% if (t.qrCodeData) { %>
-                      <div class="text-center mt-3">
-                        <img src="<%= t.qrCodeData %>" alt="QR Code" style="width: 120px; height: 120px;">
-                        <p class="text-muted mt-2 mb-0"><small>QR Ticket ID: <%= t.qrCodeId %></small></p>
-                        <% if (t.checkedIn) { %>
-                          <span class="badge bg-success">✅ เช็กอินแล้ว</span>
-                        <% } else { %>
-                          <span class="badge bg-warning text-dark">⏳ ยังไม่เช็กอิน</span>
-                        <% } %>
-                      </div>
-                    <% } else { %>
-                      <div class="alert alert-secondary mt-2">ไม่มี QR Code</div>
-                    <% } %>
-                  </div>
-                </div>
-              </div>
-            <% }) %>
+    <% if (filteredTickets && filteredTickets.length > 0) { %>
+    <div class="row">
+      <% filteredTickets.forEach(t => { %>
+      <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title"><%= t.event ? t.event.title : '(อีเวนต์ถูกลบ)' %></h5>
+            <p class="mb-1">จำนวน: <%= t.quantity %> ใบ</p>
+            <p class="mb-1"><small>วันที่ซื้อ: <%= t.purchasedAt ? t.purchasedAt.toLocaleString() : '-' %></small></p>
+            <% if (t.qrCodeData) { %>
+            <div class="text-center mt-3">
+              <img src="<%= t.qrCodeData %>" alt="QR Code" style="width:120px;height:120px;">
+              <p class="text-muted mt-2 mb-0"><small>QR Ticket ID: <%= t.qrCodeId %></small></p>
+              <% if (t.checkedIn) { %>
+              <span class="badge bg-success">✅ เช็กอินแล้ว</span>
+              <% } else { %>
+              <span class="badge bg-warning text-dark">⏳ ยังไม่เช็กอิน</span>
+              <% } %>
+            </div>
+            <% } else { %>
+            <div class="alert alert-secondary mt-2">ไม่มี QR Code</div>
+            <% } %>
           </div>
-        <% } else { %>
-          <p>คุณยังไม่ได้ซื้อบัตรใด ๆ</p>
-        <% } %>
+        </div>
+      </div>
+      <% }) %>
+    </div>
+    <% } else { %>
+    <p>ไม่พบผลการค้นหา</p>
+    <% } %>
 
-      <% } else { %>
-        <!-- Default logged-in user (role not recognized) -->
-        <h2>โปรไฟล์ของฉัน</h2>
-        <p><strong>ชื่อ:</strong> <%= currentUser.name %></p>
-        <p><strong>อีเมล:</strong> <%= currentUser.email %></p>
-      <% } %>
 
-    <% } %> <!-- ปิด currentUser check -->
+    <% } else { %>
+    <!-- Default logged-in user (role not recognized) -->
+    <h2>โปรไฟล์ของฉัน</h2>
+    <p><strong>ชื่อ:</strong> <%= currentUser.name %></p>
+    <p><strong>อีเมล:</strong> <%= currentUser.email %></p>
+    <% } %>
+
+    <% } %>
+    <!-- ปิด currentUser check -->
 
   </div>
 
