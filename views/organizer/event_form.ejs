@@ -1,6 +1,6 @@
 <%- include('../partials/head') %>
 <style>
-  a{
+  a {
     text-decoration: none;
     color: white;
   }
@@ -15,7 +15,7 @@
       <%= event && event._id ? 'แก้ไขอีเวนต์' : 'สร้างอีเวนต์ใหม่' %>
     </h2>
 
-    <form action="<%= event && event._id ? '/organizer/events/' + event._id + '?_method=PUT' : '/organizer/events' %>" method="POST" enctype="multipart/form-data">
+    <form id="eventForm" action="<%= event && event._id ? '/organizer/events/' + event._id + '?_method=PUT' : '/organizer/events' %>" method="POST" enctype="multipart/form-data">
       <div class="mb-3">
         <label>ชื่อ</label>
         <input class="form-control" name="title" value="<%= event.title || '' %>" required>
@@ -33,28 +33,31 @@
       </div>
       <div class="mb-3">
         <label>วันและเวลาเริ่มต้น</label>
-        <input type="datetime-local" class="form-control" name="startDate" value="<%= event.startDate ? new Date(event.startDate).toISOString().slice(0,16) : '' %>">
+        <input type="datetime-local" class="form-control" name="startDate" value="<%= event.startDate ? new Date(event.startDate).toISOString().slice(0,16) : '' %>" required>
       </div>
       <div class="mb-3">
         <label>วันและเวลาสิ้นสุด</label>
-        <input type="datetime-local" class="form-control" name="endDate" value="<%= event.endDate ? new Date(event.endDate).toISOString().slice(0,16) : '' %>">
+        <input type="datetime-local" class="form-control" name="endDate" value="<%= event.endDate ? new Date(event.endDate).toISOString().slice(0,16) : '' %>" required>
       </div>
       <div class="mb-3">
         <label>สถานที่</label>
-        <input class="form-control" name="location" value="<%= event.location || '' %>">
+        <input class="form-control" name="location" value="<%= event.location || '' %>" required>
       </div>
       <div class="mb-3">
         <label>จำนวนบัตรทั้งหมด</label>
-        <input type="number" class="form-control" name="totalTickets" value="<%= event.totalTickets || 0 %>" min="<%= event.soldTickets %>">
+        <input type="number" class="form-control" name="totalTickets" value="<%= event.totalTickets || 0 %>" min="<%= event.soldTickets %>" required>
         <p style="color: rgb(0, 0, 0);">ไม่สามารถต่ำกว่าคนซื้อปัจจุบันได้ : <%= event.soldTickets || 0 %> คน</p>
       </div>
       <div class="mb-3">
         <label>ราคา (บาท)</label>
-        <input type="number" class="form-control" name="price" step="0.01" min="0"value="<%= event.price || 0 %>">
+        <input type="number" class="form-control" name="price" step="0.01" min="0" value="<%= event.price || 0 %>" required>
       </div>
-      <button class="btn btn-dark" type="button" ><a href="/organizer/dashboard">back</a></button>
-      <button class="btn btn-success">บันทึก</button>
+      <button class="btn btn-dark" type="button">
+        <a href="/organizer/dashboard">back</a>
+      </button>
+      <button id="saveBtn" class="btn btn-success" type="submit">บันทึก</button>
     </form>
+
     <script>
       // เลือก input startDate และ endDate
       const startInput = document.querySelector('input[name="startDate"]');
@@ -100,6 +103,23 @@
           alert('ห้ามเลือกวันเวลาย้อนหลัง');
           dateInput.value = localNow;
         }
+      });
+    </script>
+    <script>
+      const form = document.getElementById('eventForm');
+      const saveBtn = document.getElementById('saveBtn');
+
+      form.addEventListener('submit', function() {
+        // ปิดปุ่ม
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '⏳ กำลังบันทึก...';
+
+        // ป้องกันการคลิกซ้ำหลายรอบ
+        setTimeout(() => {
+          saveBtn.disabled = true;
+        }, 100);
+
+        // ถ้าอยากรีเฟรชกลับมาใช้ได้หลังโหลดหน้าใหม่ก็ไม่ต้องใส่อะไรเพิ่ม
       });
     </script>
   </div>

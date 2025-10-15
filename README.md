@@ -12,11 +12,12 @@ Default seed users:
 - attendee: 
     jz1 / at1t@example.com / 1
 
-to do list===
+to do list ===
 otp
 qrpromptpay
-✅searchตั๋ว *1 
+✅searchตั๋ว 
 chatbot 
-สร้างevent ปุ่ม submit ดีเลย์ : ไม่งั้นสร้าง event2อัน *2
+✅สร้างevent ปุ่ม submit ดีเลย์ : ไม่งั้นสร้าง event2อัน 
 รูปโปรไฟล์ผู้ใช้ *3
-เจอบัค เข้า login -> logout -> guest -> login : แสดงปุ่ม signin/login ควรแสดง logout ทำวนไปเรื่อยเป็นบางครั้ง
+เจอบัค เข้า login -> logout -> guest -> login : แสดงปุ่ม signin/login ควรแสดง logout ทำวนไปเรื่อยเป็นบางครั้ง *1
+ทำให้ event ที่หมดอายุแล้ว ไม่สามารถซื้อตั๋วได้  *2
